@@ -16,18 +16,16 @@ OBJS = $(patsubst $(SRC)/%.c, $(DEST)/%.o, $(SRCS))
 DEPS = $(INC)/*.h $(INC)/CMSIS/*.h
 STARTUP_SRC = $(SRC)/startup_stm32f091xc.s
 STARTUP_OBJ = $(DEST)/startup_stm32f091xc.o
-TIM_SRC = $(SRC)/TIM2_IRQHandler.S
+TIM_SRC = $(SRC)/TIM2_IRQHandler.s
 TIM_OBJ = $(DEST)/TIM2_IRQHandler.o
 
-$(TIM_OBJ): $(TIM_SRC)
-	$(CC) $(COMP_FLAGS) $< -o $@
+
 
 $(DEST)/main.hex: $(DEST)/main.elf
 	objcopy -Oihex $(DEST)/main.elf $(DEST)/main.hex
 
-$(DEST)/main.elf: $(OBJS)
-	$(CC) $(LINK_FLAGS) $(STARTUP_OBJ) $(TIM_OBJ) $^ -o $@
-
+$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(TIM_OBJ)
+	$(CC) $(LINK_FLAGS) $^ -o $@
 
 $(STARTUP_OBJ): $(STARTUP_SRC)
 	$(CC) $(COMP_FLAGS) $< -o $@
@@ -35,6 +33,8 @@ $(STARTUP_OBJ): $(STARTUP_SRC)
 $(OBJS): $(DEST)/%.o : $(SRC)/%.c $(DEPS)
 	$(CC) $(COMP_FLAGS) $< -o $@
 
+$(TIM_OBJ): $(TIM_SRC)
+	$(CC) $(COMP_FLAGS) $< -o $@
 .PHONY: con debug flash clean
 
 con:
