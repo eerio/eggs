@@ -276,7 +276,7 @@ void SystemCoreClockUpdate (void)
       /* Get PLL clock source and multiplication factor ----------------------*/
       pllmull = RCC->CFGR & RCC_CFGR_PLLMUL;
       pllsource = RCC->CFGR & RCC_CFGR_PLLSRC;
-      pllmull = ( pllmull >> 18U) + 2;
+      pllmull = ( pllmull >> 18) + 2;
       predivfactor = (RCC->CFGR2 & RCC_CFGR2_PREDIV) + 1;
 
       if (pllsource == RCC_CFGR_PLLSRC_HSE_PREDIV)
@@ -307,12 +307,12 @@ void SystemCoreClockUpdate (void)
       }
       break;
     default: /* HSI used as system clock */
-      SystemCoreClock = 48000000U;//HSI_VALUE;
+      SystemCoreClock = HSI_VALUE;
       break;
   }
   /* Compute HCLK clock frequency ----------------*/
   /* Get HCLK prescaler */
-  tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4U)];
+  tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4)];
   /* HCLK clock frequency */
   SystemCoreClock >>= tmp;
 }

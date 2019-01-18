@@ -1,8 +1,21 @@
-.text
-.globl TIM2_IRQHandler
+.syntax unified
 
+.data
+gpioa: .word 0x48000000
+
+.text
+.thumb_func
+.globl blink
+.globl TIM2_IRQHandler
 TIM2_IRQHandler:
-	mov r0, #0
+	push {r0, r1, r2, lr}
+	ldr r0, =gpioa
+	ldr r0, [r0]
+	adds r0, r0, #0x18
 	ldr r1, [r0]
-	bx lr
+	movs r2, #32
+	orrs r1, r2
+	str r1, [r0]
+	bl blink
+	pop {r0, r1, r2, pc}
 
