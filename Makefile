@@ -3,6 +3,7 @@ GDB = arm-none-eabi-gdb
 INC = inc
 SRC = src
 DEST = dest
+UTIL = util
 LINKER = util/STM32F091RCTx_FLASH.ld
 OOCD_SCR = /usr/share/openocd/scripts
 
@@ -38,13 +39,14 @@ $(TIM_OBJ): $(TIM_SRC)
 .PHONY: con debug flash clean
 
 con:
-	openocd -s $(OOCD_SCR) -f $(OOCD_SCR)/board/st_nucleo_f0.cfg
+	#openocd -s $(OOCD_SCR) -f $(OOCD_SCR)/board/st_nucleo_f0.cfg
+	openocd -s util -s util/interface -s util/board -f $(UTIL)/st_nucleo_f0.cfg -f $(UTIL)/interface/stlink-v2.cfg -f $(UTIL)/target/stm32f0x_stlink.cfg
 
 debug:
-	$(GDB) -x util/debug.gdb
+	$(GDB) -x $(UTIL)/debug.gdb
 
 flash:
-	$(GDB) -x util/flash.gdb
+	$(GDB) -x $(UTIL)/flash.gdb
 
 clean:
 	rm -f $(DEST)/*
