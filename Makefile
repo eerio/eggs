@@ -39,8 +39,7 @@ $(TIM_OBJ): $(TIM_SRC)
 .PHONY: con debug flash clean
 
 con:
-	#openocd -s $(OOCD_SCR) -f $(OOCD_SCR)/board/st_nucleo_f0.cfg
-	openocd -s util -s util/interface -s util/board -f $(UTIL)/st_nucleo_f0.cfg -f $(UTIL)/interface/stlink-v2.cfg -f $(UTIL)/target/stm32f0x_stlink.cfg
+	openocd
 
 debug:
 	$(GDB) -x $(UTIL)/debug.gdb
