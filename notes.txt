@@ -1,0 +1,4 @@
+openocd fill look for openocd.cfg file by default, then in its directories
+stm32f091rc embeds stlink v2-1, not v2
+    (using v2's cfg file raises 'error: open failed')
+^ really? openocd says that stlink version v2
