@@ -1,5 +1,19 @@
 #include<stm32f0xx.h>
 
+void led_on(void) {GPIOA->BSRR |= (1 << 5);}
+void led_off(void) {GPIOA->BRR |= (1 << 5);}
+void delay(int t) {for (int i=0; i < t; ++i) __NOP();}
+
+void thread_1(void) {
+    led_on();
+    delay(100000);
+}
+
+void thread_2(void) {
+    led_off();
+    delay(100000);
+}
+
 int main() {
     /* setup GPIO */
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
@@ -14,7 +28,7 @@ int main() {
     NVIC_SetPriority(TIM2_IRQn, 0);
     TIM2->CR1 |= TIM_CR1_CEN;
     /* start timer */
-    /*TIM2->EGR |= TIM_EGR_UG;*/
+    TIM2->EGR |= TIM_EGR_UG;
 
     while (1) {}
 
