@@ -1,19 +1,48 @@
 .syntax unified
+.arch armv6-m
+
+.globl thread_1
+.globl thread_2
+.globl TIM2_IRQHandler
 
 .data
 gpioa: .word 0x48000000
+current: .word 0
+
+.bss
+.align 4
+tcb_a: .space 1
+.align 4
+tcb_b: .space 1
 
 .text
-.thumb_func
-.globl blink
-.globl TIM2_IRQHandler
+.code 16
 TIM2_IRQHandler:
-	push {r0, r1, r2, lr}
-	ldr r0, =gpioa
-	ldr r0, [r0]
-	ldr r1, [r0, #0x18]
-	movs r2, #32
-	orrs r1, r2
+	/* store context to memory */
+	push {r0-r7, lr}
+	mov sp, r0
+	bne thr_b
+	ldr r1, =tcb_a_addr
+thr_b:
+	ldr r1, =tcb_b_addr
+	str r0, [r1]
+
+	/* change executed thread */
+	ldr r0, =current_addr
+	ldr r1, [r0]
+	movs r2, #1
+	eors r1, r1, r2
 	str r1, [r0]
-	pop {r0, r1, r2, pc}
+
+	/* load context */
+	bne thr_b_s
+	ldr r0, =tcb_a_addr
+thr_b_s:
+	ldr r0, =tcb_b_addr
+	mov r0, sp
+	pop {r0-r7, pc}
+
+current_addr: .word current
+tcb_a_addr: .word tcb_a
+tcb_b_addr: .word tcb_b
 
