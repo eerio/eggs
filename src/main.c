@@ -1,11 +1,14 @@
+#include<stm32f0xx.h>
 #include<common.h>
 #include<config.h>
 #include<os.h>
 
 
 int main() {
+    uint32_t x = FLASH->OBR;
     init_sys();
     init_os();
+
 
     uint32_t st_1[1024];
     uint32_t st_2[1024];

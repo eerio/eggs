@@ -36,6 +36,7 @@ void init_task(void (*handler)(void), uint32_t *p_stack,
     p_stack[stack_size-1] = 0x01000000;
     p_stack[stack_size-2] = (uint32_t)handler;
     p_stack[stack_size-3] = (uint32_t)&task_finished;
+    task_table.n++;
 }
 
 void start_os(void) {
