@@ -3,15 +3,15 @@
 
 .text
 
-.extern led_on_delay, led_off_delay
+.extern next_task
 .globl PendSV_Handler
 
 .thumb_func
 PendSV_Handler:
-	cpsid i
+	//cpsid i
 	push {r4, lr}
 	bl led_on_delay
 	bl led_off_delay
-	cpsie i
+	//cpsie i
 	pop {r4, pc}
 

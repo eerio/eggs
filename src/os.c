@@ -15,8 +15,9 @@ struct {
 void init_os(void) {
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(PendSV_IRQn);
+    /* priority low to allow IRQs to pend normally */
     NVIC_SetPriority(SysTick_IRQn, 0x00);
-    NVIC_SetPriority(SysTick_IRQn, 0xFF);
+    NVIC_SetPriority(SysTick_IRQn, 0x00);
 
     SysTick_Config(SystemCoreClock);
     //NVIC_EnableIRQ(SVC_IRQn);
