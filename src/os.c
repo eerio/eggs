@@ -44,6 +44,7 @@ void SysTick_Handler(void) {
     //if (task_table.cur >= task_table.n) task_table.cur = 0;
     //next_task = &task_table.tasks[task_table.cur];
     // 2. switch context
+    // this def is in core_cm0.h; doc: ProgMan, p.78
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
