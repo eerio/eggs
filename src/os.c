@@ -1,3 +1,4 @@
+#include<string.h>
 #include<os.h>
 #define MAX_TASKS (16U)
 
@@ -16,13 +17,15 @@ os_tcb *current_tcb;
 os_tcb *next_tcb;
 
 void init_os(void) {
+    memset(&task_table, 0, sizeof(task_table));
+
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(PendSV_IRQn);
     /* priority low to allow IRQs to pend normally */
     NVIC_SetPriority(SysTick_IRQn, 0x00);
     NVIC_SetPriority(SysTick_IRQn, 0x00);
 
-    SysTick_Config(SystemCoreClock);
+
     //NVIC_EnableIRQ(SVC_IRQn);
     //NVIC_SetPriority(SVC_IRQn, 0xFF);
 }
@@ -30,6 +33,9 @@ void task_finished(void) {while(1){}}
 
 void init_task(void (*handler)(void), uint32_t *p_stack,
         uint32_t stack_size) {
+    
+    if (task_table.n >= MAX_TASKS) while(1) {}
+
     os_tcb *tcb = &task_table.tasks[task_table.n];
     tcb->handler = handler;
     tcb->sp = (uint32_t)(p_stack + stack_size - 16);
@@ -40,7 +46,15 @@ void init_task(void (*handler)(void), uint32_t *p_stack,
 }
 
 void start_os(void) {
+    if (SysTick_Config(SystemCoreClock) != 0)
+        return;
 
+    /* start first task */
+    current_tcb = &task_table.tasks[task_table.cur];
+    __set_PSP(current_tcb->sp + 64);
+    __set_CONTROL(0x03);
+    __ISB();
+    current_tcb->handler();
 }
 
 void SysTick_Handler(void) {
