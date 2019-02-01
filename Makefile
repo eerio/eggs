@@ -19,14 +19,14 @@ STARTUP_SRC = $(SRC)/startup_stm32f091xc.s
 STARTUP_OBJ = $(DEST)/startup_stm32f091xc.o
 TIM_SRC = $(SRC)/TIM2_IRQHandler.s
 TIM_OBJ = $(DEST)/TIM2_IRQHandler.o
-
+PendSV_SRC = $(SRC)/PendSV_Handler.s
+PendSV_OBJ = $(DEST)/PendSV_Handler.o
 
 
 $(DEST)/main.hex: $(DEST)/main.elf
 	objcopy -Oihex $(DEST)/main.elf $(DEST)/main.hex
 
-#$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(TIM_OBJ)
-$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ)
+$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(TIM_OBJ) $(PendSV_OBJ)
 	$(CC) $(LINK_FLAGS) $^ -o $@
 
 $(STARTUP_OBJ): $(STARTUP_SRC)
@@ -35,8 +35,12 @@ $(STARTUP_OBJ): $(STARTUP_SRC)
 $(OBJS): $(DEST)/%.o : $(SRC)/%.c $(DEPS)
 	$(CC) $(COMP_FLAGS) $< -o $@
 
+$(PendSV_OBJ): $(PendSV_SRC)
+	$(CC) $(COMP_FLAGS) $< -o $@
+
 $(TIM_OBJ): $(TIM_SRC)
 	$(CC) $(COMP_FLAGS) $< -o $@
+
 .PHONY: con debug flash clean
 
 con:
