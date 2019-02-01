@@ -7,4 +7,4 @@ base:
 Cortex-M0 Devices Generic User Guide, 2.1.3: Core registers #CONTROL register
 info:
 
-
+asm: add thumb_func before thumb function! wwdg otherwise
