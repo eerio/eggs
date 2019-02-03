@@ -52,7 +52,7 @@ void init_os(void) {
     /* Lowest priority is obligatory for IRQ handlers to execute casually */
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(PendSV_IRQn);
-    NVIC_SetPriority(SysTick_IRQn, 0xFF);
+    NVIC_SetPriority(SysTick_IRQn, 0x00);
     NVIC_SetPriority(PendSV_IRQn, 0xFF);
 
     /* Set the default TCB */
