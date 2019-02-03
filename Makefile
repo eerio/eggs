@@ -26,7 +26,8 @@ PendSV_OBJ = $(DEST)/PendSV_Handler.o
 $(DEST)/main.hex: $(DEST)/main.elf
 	objcopy -Oihex $(DEST)/main.elf $(DEST)/main.hex
 
-$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(TIM_OBJ) $(PendSV_OBJ)
+#$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(TIM_OBJ) $(PendSV_OBJ)
+$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ)
 	$(CC) $(LINK_FLAGS) $^ -o $@
 
 $(STARTUP_OBJ): $(STARTUP_SRC)
