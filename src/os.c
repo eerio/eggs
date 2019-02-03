@@ -20,19 +20,19 @@ typedef struct {
     void (*handler)(void);
 } TCB;
 
-/* Basic stack frame structure */
-/* static typedef struct { */
-/* Use enum, so the fields don't have junk values; debugging purposes */
+/* Basic stack frame structure
+ * Assign 0xC1000000 to xPSR by default - it's the value that my
+ * board starts with (gdb shows it), along with*/
 static struct {
-    uint32_t r0; ///xpsr
-    uint32_t r1; //pc
-    uint32_t r2; //lr
+    uint32_t xPSR;
+    uint32_t PC;
+    uint32_t LR;
     uint32_t r12;
     uint32_t r3;
-    uint32_t LR;
-    uint32_t PC; 
-    uint32_t xPSR;
-} StackFrame = {0x01000000U, 0, (uint32_t)LoopForever,
+    uint32_t r2;
+    uint32_t r1;
+    uint32_t r0;
+} StackFrame = {0xC1000000U, 0, (uint32_t)LoopForever,
     1000, 1001, 1002, 1003, 1004};
 
 /* Table of all the tasks initialied */
