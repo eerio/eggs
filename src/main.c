@@ -22,6 +22,8 @@ int main(void) {
 
     /* Add threads to perform */
     init_task(handler_blinking_fast);
+    init_task(handler_blinking_medium);
+    init_task(handler_blinking_slow);
 
     /* Start executing the threads */
     start_os();
