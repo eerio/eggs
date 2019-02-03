@@ -84,6 +84,7 @@ void init_task(void (*handler)(void)) {
 void start_os(void) {
     /* Start SysTick */
     SysTick_Config(SystemCoreClock);
+
     /* Now set Stack Pointer properly, so it's get saved in the
      * Stack Frame of proper task:
      * - Set appropriate Stack Pointer
@@ -100,16 +101,15 @@ void start_os(void) {
 
 void SysTick_Handler(void) {
     /* Update current TCB's pointer */
-    next_tcb = current_tcb;
-    //current_tcb = next_tcb;
+    current_tcb = &TaskTable.tasks[TaskTable.current_task_num];
 
     /* Fetch next task to execute */
-    //if (++TaskTable.current_task_num >= TaskTable.tasks_num) {
-        //TaskTable.current_task_num = 0;
-    //}
+    if (++TaskTable.current_task_num >= TaskTable.tasks_num) {
+        TaskTable.current_task_num = 0;
+    }
 
     /* Update next TCB's pointer */
-    //next_tcb = &TaskTable.tasks[TaskTable.current_task_num];
+    next_tcb = &TaskTable.tasks[TaskTable.current_task_num];
 
     /* Jump to PendSV for context switching
      * for SCB register documentation: ProgMan, p.78
