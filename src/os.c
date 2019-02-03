@@ -4,15 +4,18 @@
  * github.com@eerio
  */
 #include<stdlib.h> /* malloc */
-#include<string.h> /* memset, memove */
+#include<string.h> /* memset, memcpy */
 #include<os.h>
 
 #define MAX_TASKS (16U)
 #define STACK_SIZE (1024U)
 
 
+/* It's implemented in startup_stm32f091xc.s file */
+void LoopForever(void);
+
 /* Task Control Block type */
-static typedef struct {
+typedef struct {
     void *sp;
     void (*handler)(void);
 } TCB;
@@ -20,8 +23,8 @@ static typedef struct {
 /* Basic stack frame structure */
 /* static typedef struct { */
 /* Use enum, so the fields don't have junk values; debugging purposes */
-static typedef enum {
-    uint32_t xPSR = 1000;
+struct {
+    uint32_t xPSR;
     uint32_t PC;
     uint32_t LR;
     uint32_t r12;
@@ -29,7 +32,9 @@ static typedef enum {
     uint32_t r2;
     uint32_t r1;
     uint32_t r0;
-} StackFrame;
+} StackFrame = {
+    0x01000000U, 0, (uint32_t)LoopForever,
+    1000, 1001, 1002, 1003, 1004};
 
 /* Table of all the tasks initialied */
 static struct {
@@ -57,21 +62,18 @@ void init_os(void) {
 
 void init_task(void (*handler)(void)) {
     /* Add new TCB to the table */
-    TCB *tcb = &TaskTable.tasks[task_table.tasks_num];
+    TCB *tcb = &TaskTable.tasks[TaskTable.tasks_num];
 
     /* Allocate memory for the stack */
     void *new_stack = malloc(STACK_SIZE);
     
     /* Initialize stack with a proper stack frame to pop from it */
-    StackFrame sf = {
-        .xPSR = 0x01000000;
-        .PC = handler;
-        .LR = LoopForever;
-    };
-    memmove(new_stack, sf, sizeof sf);
+    StackFrame.PC = (uint32_t)handler;
+    memcpy(new_stack, &StackFrame, sizeof StackFrame);
 
     /* Initialize TCB */
     tcb->sp = new_stack;
+    tcb->handler = handler;
 
     /* Update TaskTable metadata */
     TaskTable.tasks_num++;
@@ -86,7 +88,7 @@ void start_os(void) {
      * - Switch SP to use Process Stack Pointer
      * - Flush processor pipeline for it to use the new SP
      */
-    __set_PSP(current_tcb->sp);
+    __set_PSP((uint32_t)current_tcb->sp);
     __set_CONTROL(2);
     __ISB();
 
@@ -99,12 +101,12 @@ void SysTick_Handler(void) {
     current_tcb = next_tcb;
 
     /* Fetch next task to execute */
-    if (++TaskTable.current_task >= TaskTable.tasks_num) {
-        task_table.cur = 0;
+    if (++TaskTable.current_task_num >= TaskTable.tasks_num) {
+        TaskTable.current_task_num = 0;
     }
 
     /* Update next TCB's pointer */
-    next_tcb = TaskTable.tasks[TaskTable.current_task_num];
+    next_tcb = &TaskTable.tasks[TaskTable.current_task_num];
 
     /* Jump to PendSV for context switching
      * for SCB register documentation: ProgMan, p.78

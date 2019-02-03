@@ -23,10 +23,10 @@ void delay (unsigned int time) {
 }
 
 /* TODO: Shouldn't there be some irq-disables/enables? */
-void handler_blinking(unsigned int time) {
+void handler_blinking_fast(void) {
     while(1) {
         LED_TOGGLE();
-        delay(time);
+        delay(50000);
     }
 }
 
