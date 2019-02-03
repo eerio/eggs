@@ -23,16 +23,17 @@ PendSV_SRC = $(SRC)/PendSV_Handler.s
 PendSV_OBJ = $(DEST)/PendSV_Handler.o
 
 
-$(DEST)/main.hex: $(DEST)/main.elf
-	arm-none-eabi-objcopy -Oihex $(DEST)/main.elf $(DEST)/main.hex
-	arm-none-eabi-objcopy --only-keep-debug $(DEST)/main.elf $(DEST)/main.dbg
-	arm-none-eabi-strip --strip-debug --strip-unneeded $(DEST)/main.elf
+$(DEST)/main.hex: $(DEST)/main_big.elf
+	arm-none-eabi-objcopy -Oihex $< $@
+	#arm-none-eabi-strip --strip-debug --strip-unneeded $@ -o $@
 
-#$(DEST)/main.dbg: $(DEST)/main.elf
+$(DEST)/main.dbg: $(DEST)/main_big.elf
+	arm-none-eabi-objcopy --only-keep-debug $< $@
 
+#$(DEST)/main.elf: $(DEST)/main_big.elf
+	#arm-none-eabi-strip --strip-debug --strip-unneeded $^ -o $@
 
-#$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(TIM_OBJ) $(PendSV_OBJ)
-$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ)
+$(DEST)/main_big.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ)
 	$(CC) $(LINK_FLAGS) $^ -o $@
 
 $(STARTUP_OBJ): $(STARTUP_SRC)
@@ -52,10 +53,10 @@ $(TIM_OBJ): $(TIM_SRC)
 con:
 	openocd
 
-debug:
+debug: $(DEST)/main.dbg
 	$(GDB) -x $(UTIL)/debug.gdb
 
-flash:
+flash: $(DEST)/main.hex $(DEST)/main.dbg
 	$(GDB) -x $(UTIL)/flash.gdb
 
 clean:
