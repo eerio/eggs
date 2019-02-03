@@ -8,6 +8,8 @@
 /* Simplest delay routine possible, it counts down n times */
 void delay(unsigned int);
 
-/* Handler for a thread. It periodically toggles the User LED */
+/* Handlers. They periodically toggle the User LED with different freq. */
 void handler_blinking_fast(void);
+void handler_blinking_medium(void);
+void handler_blinking_slow(void);
 
