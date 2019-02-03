@@ -3,6 +3,7 @@
  * author: Paweł Balawender
  * github.com@eerio
  */
+#include<stm32f0xx.h> /* CCR */
 #include<stdlib.h> /* malloc */
 #include<string.h> /* memset, memcpy */
 #include<os.h>
@@ -48,11 +49,13 @@ TCB *current_tcb, *next_tcb;
 
 
 void init_os(void) {
-    /*memset(&TaskTable, 0, sizeof TaskTable);*/
+    /* Zero task table */
+    memset(&TaskTable, 0, sizeof TaskTable);
+
     /* Lowest priority is obligatory for IRQ handlers to execute casually */
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(PendSV_IRQn);
-    NVIC_SetPriority(SysTick_IRQn, 0x00);
+    NVIC_SetPriority(SysTick_IRQn, 0xFF);
     NVIC_SetPriority(PendSV_IRQn, 0xFF);
 
     /* Set the default TCB */
@@ -68,10 +71,10 @@ void init_task(void (*handler)(void)) {
     
     /* Initialize stack with a proper stack frame to pop from it */
     StackFrame.PC = (uint32_t)handler;
-    memcpy(new_stack, &StackFrame, sizeof StackFrame);
+    memcpy(new_stack+STACK_SIZE-64, &StackFrame, sizeof StackFrame);
 
     /* Initialize TCB */
-    tcb->sp = new_stack;
+    tcb->sp = new_stack + STACK_SIZE - 64;
     tcb->handler = handler;
 
     /* Update TaskTable metadata */
@@ -97,15 +100,16 @@ void start_os(void) {
 
 void SysTick_Handler(void) {
     /* Update current TCB's pointer */
-    current_tcb = next_tcb;
+    next_tcb = current_tcb;
+    //current_tcb = next_tcb;
 
     /* Fetch next task to execute */
-    if (++TaskTable.current_task_num >= TaskTable.tasks_num) {
-        TaskTable.current_task_num = 0;
-    }
+    //if (++TaskTable.current_task_num >= TaskTable.tasks_num) {
+        //TaskTable.current_task_num = 0;
+    //}
 
     /* Update next TCB's pointer */
-    next_tcb = &TaskTable.tasks[TaskTable.current_task_num];
+    //next_tcb = &TaskTable.tasks[TaskTable.current_task_num];
 
     /* Jump to PendSV for context switching
      * for SCB register documentation: ProgMan, p.78
