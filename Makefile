@@ -8,7 +8,7 @@ LINKER = util/STM32F091RCTx_FLASH.ld
 OOCD_SCR = /usr/share/openocd/scripts
 
 INCLUDES = -I$(INC) -I$(INC)/CMSIS
-COMMON_FLAGS = -std=c99 -g3 -mcpu=cortex-m0 -mthumb -mlittle-endian -DSTM32F091xC
+COMMON_FLAGS = -std=c99 -g -gdwarf-2 -mcpu=cortex-m0 -mthumb -mlittle-endian -DSTM32F091xC
 COMP_FLAGS = $(COMMON_FLAGS) -Wall -Wextra $(INCLUDES) -c
 LINK_FLAGS = $(COMMON_FLAGS) -g3 -T$(LINKER) -Wl,--gc-sections --specs=nosys.specs
 
@@ -24,9 +24,9 @@ PendSV_OBJ = $(DEST)/PendSV_Handler.o
 
 
 $(DEST)/main.hex: $(DEST)/main.elf
-	objcopy -Oihex $(DEST)/main.elf $(DEST)/main.hex
-	objcopy --only-keep-debug $(DEST)/main.elf $(DEST)/main.dbg
-	strip --strip-debug --strip-unneeded $(DEST)/main.elf
+	arm-none-eabi-objcopy -Oihex $(DEST)/main.elf $(DEST)/main.hex
+	arm-none-eabi-objcopy --only-keep-debug $(DEST)/main.elf $(DEST)/main.dbg
+	arm-none-eabi-strip --strip-debug --strip-unneeded $(DEST)/main.elf
 
 #$(DEST)/main.dbg: $(DEST)/main.elf
 
