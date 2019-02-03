@@ -1,40 +1,32 @@
+/* Miscellaneous, commonly used functions and procedures
+ *
+ * author: Paweł Balawender
+ * github.com@eerio
+ */
 #include<common.h>
 
-void delay (volatile int t) {
-    while(t > 0) --t;
+/* Macros for the User LED, LD2, pin 5 @ GPIO port A */
+#define LED_PORT (GPIOA)
+#define LED_PIN (5U)
+#define LED_ON() (LED_PORT->BSRR |= (1 << LED_PIN))
+#define LED_OFF() (LED_PORT->BRR |= (1 << LED_PIN))
+#define LED_TOGGLE() (LED_PORT->ODR ^= (1 << LED_PIN))
+
+/* TODO: Change this function to make it compiler-optimizations-proof */
+/* TODO: Make it timer- and interruption-based, so it's accurate,
+ *          [time-in-seconds-or-minutes-or-sth]-programmable and
+ *          another interrupts occuring will not affect it
+ * TODO: It should be NOP()-based
+ */
+void delay (unsigned int time) {
+    while (time > 0) --time;
 }
 
-void blinking(int t) {
-    LED_ON();
-    delay(t);
-    LED_OFF();
-    delay(t);
-}
-
-void hand_blink_fast(void) {
+/* TODO: Shouldn't there be some irq-disables/enables? */
+void handler_blinking(unsigned int time) {
     while(1) {
-        __disable_irq();
-        GPIOA->ODR ^= (1 << LED_PIN);
-        __enable_irq();
-        delay(100000);
-    }
-}
-
-void hand_blink_med(void) {
-    while(1) {
-        __disable_irq();
-        GPIOA->ODR ^= (1 << LED_PIN);
-        __enable_irq();
-        delay(50000);
-    }
-}
-
-void hand_blink_slow(void) {
-    while(1) {
-        __disable_irq();
-        LED_OFF();
-        __enable_irq();
-        delay(35000);
+        LED_TOGGLE();
+        delay(time);
     }
 }
 

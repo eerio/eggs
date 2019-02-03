@@ -1,73 +1,115 @@
-#include<string.h>
+/* Core methods and data structures required by the OS to work properly
+ *
+ * author: Paweł Balawender
+ * github.com@eerio
+ */
+#include<stdlib.h> /* malloc */
+#include<string.h> /* memset, memove */
 #include<os.h>
+
 #define MAX_TASKS (16U)
+#define STACK_SIZE (1024U)
 
-typedef struct {
-    uint32_t sp;
+
+/* Task Control Block type */
+static typedef struct {
+    void *sp;
     void (*handler)(void);
-} os_tcb;
+} TCB;
 
-struct {
-    os_tcb tasks[MAX_TASKS];
-    uint32_t cur;
-    uint32_t n;
-} task_table;
+/* Basic stack frame structure */
+/* static typedef struct { */
+/* Use enum, so the fields don't have junk values; debugging purposes */
+static typedef enum {
+    uint32_t xPSR = 1000;
+    uint32_t PC;
+    uint32_t LR;
+    uint32_t r12;
+    uint32_t r3;
+    uint32_t r2;
+    uint32_t r1;
+    uint32_t r0;
+} StackFrame;
 
-os_tcb *current_tcb;
-os_tcb *next_tcb;
+/* Table of all the tasks initialied */
+static struct {
+    TCB tasks[MAX_TASKS];
+    unsigned int current_task_num;
+    unsigned int tasks_num;
+} TaskTable;
+
+/* Pointers to TCBs of the currently executing task and the next one */
+/* TODO: why tf i made them pointers, they can be direct, dont they?*/
+TCB *current_tcb, *next_tcb;
+
 
 void init_os(void) {
-    memset(&task_table, 0, sizeof(task_table));
-
+    /*memset(&TaskTable, 0, sizeof TaskTable);*/
+    /* Lowest priority is obligatory for IRQ handlers to execute casually */
     NVIC_EnableIRQ(SysTick_IRQn);
     NVIC_EnableIRQ(PendSV_IRQn);
-    /* priority low to allow IRQs to pend normally */
-    NVIC_SetPriority(SysTick_IRQn, 0x00);
-    NVIC_SetPriority(SysTick_IRQn, 0x00);
+    NVIC_SetPriority(SysTick_IRQn, 0xFF);
+    NVIC_SetPriority(PendSV_IRQn, 0xFF);
 
-
-    //NVIC_EnableIRQ(SVC_IRQn);
-    //NVIC_SetPriority(SVC_IRQn, 0xFF);
+    /* Set the default TCB */
+    current_tcb = &TaskTable.tasks[0];
 }
-void task_finished(void) {while(1){}}
 
-void init_task(void (*handler)(void), uint32_t *p_stack,
-        uint32_t stack_size) {
+void init_task(void (*handler)(void)) {
+    /* Add new TCB to the table */
+    TCB *tcb = &TaskTable.tasks[task_table.tasks_num];
+
+    /* Allocate memory for the stack */
+    void *new_stack = malloc(STACK_SIZE);
     
-    if (task_table.n >= MAX_TASKS) while(1) {}
+    /* Initialize stack with a proper stack frame to pop from it */
+    StackFrame sf = {
+        .xPSR = 0x01000000;
+        .PC = handler;
+        .LR = LoopForever;
+    };
+    memmove(new_stack, sf, sizeof sf);
 
-    os_tcb *tcb = &task_table.tasks[task_table.n];
-    tcb->handler = handler;
-    tcb->sp = (uint32_t)(p_stack + stack_size - 16);
-    p_stack[stack_size-1] = 0x01000000;
-    p_stack[stack_size-2] = (uint32_t)handler;
-    p_stack[stack_size-3] = (uint32_t)&task_finished;
-    task_table.n++;
+    /* Initialize TCB */
+    tcb->sp = new_stack;
+
+    /* Update TaskTable metadata */
+    TaskTable.tasks_num++;
 }
 
 void start_os(void) {
-    if (SysTick_Config(SystemCoreClock) != 0)
-        return;
-
-    /* start first task */
-    current_tcb = &task_table.tasks[task_table.cur];
-    __set_PSP(current_tcb->sp + 64);
-    __set_CONTROL(0x03);
+    /* Start SysTick */
+    SysTick_Config(SystemCoreClock);
+    /* Now set Stack Pointer properly, so it's get saved in the
+     * Stack Frame of proper task:
+     * - Set appropriate Stack Pointer
+     * - Switch SP to use Process Stack Pointer
+     * - Flush processor pipeline for it to use the new SP
+     */
+    __set_PSP(current_tcb->sp);
+    __set_CONTROL(2);
     __ISB();
+
+    /* Start execution of the first task */
     current_tcb->handler();
 }
 
 void SysTick_Handler(void) {
-    // 1. update
-    current_tcb = &task_table.tasks[task_table.cur];
-    // 2. get next task to run
+    /* Update current TCB's pointer */
+    current_tcb = next_tcb;
 
-    task_table.cur++;
-    if (task_table.cur >= task_table.n) task_table.cur = 0;
-    next_tcb = &task_table.tasks[task_table.cur];
+    /* Fetch next task to execute */
+    if (++TaskTable.current_task >= TaskTable.tasks_num) {
+        task_table.cur = 0;
+    }
 
-    // 3. switch context
-    // this def is in core_cm0.h; doc: ProgMan, p.78
+    /* Update next TCB's pointer */
+    next_tcb = TaskTable.tasks[TaskTable.current_task_num];
+
+    /* Jump to PendSV for context switching
+     * for SCB register documentation: ProgMan, p.78
+     * for SCB register definition: core_cm0.h
+     */
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
