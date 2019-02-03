@@ -1,13 +1,13 @@
+/* Collection of miscellaneous and commonly-used functions and macros
+ *
+ * author: Paweł Balawender
+ * github.com@eerio
+ */
 #include<stm32f0xx.h>
 
-#define LED_PORT (GPIOA)
-#define LED_PIN (5U)
-#define LED_ON() (LED_PORT->BSRR |= (1 << LED_PIN))
-#define LED_OFF() (LED_PORT->BRR |= (1 << LED_PIN))
+/* Simplest delay routine possible, it counts down n times */
+void delay(unsigned int);
 
-void delay(int);
-void blinking(int);
-void hand_blink_fast(void);
-void hand_blink_med(void);
-void hand_blink_slow(void);
+/* Handler for a thread. It periodically toggles the User LED */
+void handler_blinking_fast(void);
 

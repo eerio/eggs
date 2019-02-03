@@ -1,10 +1,11 @@
 .syntax unified
 .cpu cortex-m0
+.fpu softvfp
 
-.text
-.globl PendSV_Handler
+.thumb
+.global PendSV_Handler
 
-.thumb_func
+.type PendSV_Handler, %function
 PendSV_Handler:
 	/* Disable interrupts - it's a critical code part */
 	cpsid	i

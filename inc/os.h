@@ -1,6 +1,16 @@
+/* Prototypes of core Operating System procedures and functions
+ *
+ * author: Paweł Balawender
+ * github.com@eerio
+ */
 #include<stm32f0xx.h>
 
+/* Initialize OS environment - configure interrupts, create TCBs etc. */
 void init_os(void);
-void init_task(void (*handler)(void), uint32_t*, uint32_t);
+
+/* Initialize new task for a future thread - allocate memory, prepare stack */
+void init_task(void (*)(void));
+
+/* Start execution of the tasks in the queue */
 void start_os(void);
 
