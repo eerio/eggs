@@ -8,9 +8,9 @@ LINKER = util/STM32F091RCTx_FLASH.ld
 OOCD_SCR = /usr/share/openocd/scripts
 
 INCLUDES = -I$(INC) -I$(INC)/CMSIS
-COMMON_FLAGS = -std=c99 -g3 -O0 -mcpu=cortex-m0 -mthumb -mlittle-endian -DSTM32F091xC
+COMMON_FLAGS = -std=c99 -g3 -mcpu=cortex-m0 -mthumb -mlittle-endian -DSTM32F091xC
 COMP_FLAGS = $(COMMON_FLAGS) -Wall -Wextra $(INCLUDES) -c
-LINK_FLAGS = $(COMMON_FLAGS) -T$(LINKER) -Wl,--gc-sections --specs=nosys.specs
+LINK_FLAGS = $(COMMON_FLAGS) -g3 -T$(LINKER) -Wl,--gc-sections --specs=nosys.specs
 
 SRCS = $(wildcard $(SRC)/*.c)
 OBJS = $(patsubst $(SRC)/%.c, $(DEST)/%.o, $(SRCS))
@@ -25,6 +25,11 @@ PendSV_OBJ = $(DEST)/PendSV_Handler.o
 
 $(DEST)/main.hex: $(DEST)/main.elf
 	objcopy -Oihex $(DEST)/main.elf $(DEST)/main.hex
+	objcopy --only-keep-debug $(DEST)/main.elf $(DEST)/main.dbg
+	strip --strip-debug --strip-unneeded $(DEST)/main.elf
+
+#$(DEST)/main.dbg: $(DEST)/main.elf
+
 
 #$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(TIM_OBJ) $(PendSV_OBJ)
 $(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ)

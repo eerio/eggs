@@ -25,7 +25,9 @@ void delay (unsigned int time) {
 /* TODO: Shouldn't there be some irq-disables/enables? */
 void handler_blinking_fast(void) {
     while(1) {
+        __disable_irq();
         LED_TOGGLE();
+        __enable_irq();
         delay(50000);
     }
 }
