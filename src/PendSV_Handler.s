@@ -1,14 +1,14 @@
 .syntax unified
 .cpu cortex-m0
 .fpu softvfp
-
 .thumb
+
 .global PendSV_Handler
 
 .type PendSV_Handler, %function
 PendSV_Handler:
 	/* Disable interrupts - it's a critical code part */
-	cpsid	i
+	cpsid i
 
 	/* Save current task's SP: */
 	ldr	r2, =current_tcb
@@ -17,11 +17,11 @@ PendSV_Handler:
 	str	r0, [r1]
 
 	/* Load next task's SP: */
-	ldr	r2, =next_tcb
+	ldr	r1, =next_tcb
 	ldr	r1, [r2]
 	ldr	r0, [r1]
 	msr	psp, r0
-
+	
 	/* Refer to ProgMan, p. 27 for documentation of branching
 	 * to a magic number like this.
 	 * 
@@ -34,7 +34,6 @@ PendSV_Handler:
 	 * has to be executed as late as possible, to minimize the possibility
 	 * of another interrupt overtaking the control during context switching
 	 */
-	ldr r0, =0xFFFFFFFD
-	cpsie	i	
-	bx	r0
+	cpsie i
+	bx	lr
 

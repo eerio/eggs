@@ -17,8 +17,8 @@
  *          another interrupts occuring will not affect it
  * TODO: It should be NOP()-based
  */
-inline void delay (register volatile unsigned int time) {
-    while (time > 0) --time;
+void delay (unsigned int time) {
+    while (time > 0) {--time;}
 }
 
 /* TODO: Shouldn't there be some irq-disables/enables? */
@@ -30,9 +30,7 @@ void handler_blinking_fast(void) {
 
 void handler_blinking_medium(void) {
     while(1) {
-        __disable_irq();
         LED_TOGGLE();
-        __enable_irq();
         delay(30000);
     }
 }

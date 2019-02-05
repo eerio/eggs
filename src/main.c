@@ -14,6 +14,7 @@
 #include<os.h>
 #include<common.h>
 
+
 int main(void) {
     /* Configure board's peripherals */
     init_sys();
