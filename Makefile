@@ -21,8 +21,6 @@ TIM_SRC = $(SRC)/TIM2_IRQHandler.s
 TIM_OBJ = $(DEST)/TIM2_IRQHandler.o
 PendSV_SRC = $(SRC)/PendSV_Handler.s
 PendSV_OBJ = $(DEST)/PendSV_Handler.o
-start_os_SRC = $(SRC)/start_os.s
-start_os_OBJ = $(DEST)/start_os.o
 
 $(DEST)/main.hex: $(DEST)/main_big.elf
 	arm-none-eabi-objcopy -Oihex $< $@
@@ -34,7 +32,7 @@ $(DEST)/main.dbg: $(DEST)/main_big.elf
 #$(DEST)/main.elf: $(DEST)/main_big.elf
 	#arm-none-eabi-strip --strip-debug --strip-unneeded $^ -o $@
 
-$(DEST)/main_big.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ) $(start_os_OBJ)
+$(DEST)/main_big.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ)
 	$(CC) $(LINK_FLAGS) $^ -o $@
 
 $(start_os_OBJ): $(start_os_SRC)
