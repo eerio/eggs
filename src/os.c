@@ -3,28 +3,21 @@
  * author: Paweł Balawender
  * github.com@eerio
  */
-#include<stm32f0xx.h> /* CCR */
-#include<stdlib.h> /* malloc, calloc */
-#include<string.h> /* memset, memcpy */
+#include<stm32f0xx.h> /* SCB */
+#include<stdlib.h> /* calloc */
+#include<string.h> /* memcpy */
 #include<os.h>
 
 #define MAX_TASKS (16U)
 #define STACK_SIZE (256U)
-
-
-/* It's implemented in startup_stm32f091xc.s file */
-void LoopForever(void);
+#define DEFAULT_XPSR (0xC1000000U)
 
 /* Task Control Block type */
 typedef struct {
     void *sp;
-    void (*handler)(void);
 } TCB;
 
-/* Basic stack frame structure
- * Assign 0xC1000000 to xPSR by default - it's the value that my
- * board initially loads to its xPSR
- */
+/* Basic stack frame structure */
 static struct {
     uint32_t r0;
     uint32_t r1;
@@ -34,8 +27,7 @@ static struct {
     uint32_t LR;
     uint32_t PC;
     uint32_t xPSR;
-} StackFrame = {1000, 1001, 1002, 1003, 1012,
-    (uint32_t)LoopForever, 0, 0x01000000U};
+} StackFrame = {0, 0, 0, 0, 0, (uint32_t)LoopForever, 0, DEFAULT_XPSR};
 
 /* Table of all the tasks initialied */
 static struct {
@@ -45,7 +37,6 @@ static struct {
 } TaskTable = {0};
 
 /* TCBs of the currently executing task and the next one */
-/* Use pointers! really */
 TCB *current_tcb, *next_tcb;
 
 
@@ -71,7 +62,6 @@ void init_task(void (*handler)(void)) {
 
     /* Initialize TCB */
     tcb->sp = new_stack;
-    tcb->handler = handler;
 
     /* Update TaskTable metadata */
     TaskTable.tasks_num++;
@@ -96,7 +86,10 @@ void start_os(void) {
     __set_PSP((uint32_t)current_tcb->sp);
     __set_CONTROL(0x02);
     __ISB();
-    current_tcb->handler();
+
+    /* Fetch the handler from current TCB and call it */
+    void (**handler)(void) = current_tcb->sp + 0x18;
+    (*(*handler))();
 }
 
 void SysTick_Handler(void) {
