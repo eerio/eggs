@@ -5,14 +5,15 @@
  */
 #include<stm32f0xx.h>
 
+/* Infinite loop function, implemented in startup_stm32f091xc.s file */
+void LoopForever(void);
+
 /* Initialize OS environment - configure interrupts, create TCBs etc. */
 void init_os(void);
 
 /* Initialize new task for a future thread - allocate memory, prepare stack */
 void init_task(void (*)(void));
 
-/* Start execution of the tasks in the queue
- * This function is implemented in start_os.s file
- */
+/* Start execution of the tasks in the queue */
 void start_os(void);
 
