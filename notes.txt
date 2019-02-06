@@ -9,3 +9,8 @@ Cortex-M0 Devices Generic User Guide, 2.1.3: Core registers #CONTROL register
 info:
 
 asm: add thumb_func before thumb function! wwdg otherwise
+
+calling a function changes the stack and because of it i couldnt return
+to my previous stack frame when i started the os by calling tcb->handler()
+(probably)
+
