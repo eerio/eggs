@@ -18,7 +18,7 @@ void LoopForever(void);
 /* Task Control Block type */
 typedef struct {
     void *sp;
-    /*void (*handler)(void);*/
+    void (*handler)(void);
 } TCB;
 
 /* Basic stack frame structure
@@ -71,7 +71,7 @@ void init_task(void (*handler)(void)) {
 
     /* Initialize TCB */
     tcb->sp = new_stack;
-    /*tcb->handler = handler;*/
+    tcb->handler = handler;
 
     /* Update TaskTable metadata */
     TaskTable.tasks_num++;
@@ -84,8 +84,8 @@ void start_os(void) {
      * this solution is that #0's stack doesn't get spoiled by some
      * unnecessary calls to its handler
      */
-    current_tcb = &TaskTable.tasks[TaskTable.tasks_num - 1];
-    TaskTable.current_task_num = 2;
+    TaskTable.current_task_num = TaskTable.tasks_num - 1;
+    current_tcb = &TaskTable.tasks[TaskTable.current_task_num];
     
     /* Set SysTick interrupt period to 1s */
     SysTick_Config(SystemCoreClock);
@@ -95,7 +95,8 @@ void start_os(void) {
      */
     __set_PSP((uint32_t)current_tcb->sp);
     __set_CONTROL(0x02);
-    __ISB(); 
+    __ISB();
+    current_tcb->handler();
 }
 
 void SysTick_Handler(void) {
