@@ -13,14 +13,14 @@ PendSV_Handler:
 	/* Save current task's SP: */
 	ldr	r2, =current_tcb
 	ldr	r1, [r2]
-	mrs	r0, psp
+	mrs	r0, msp
 	str	r0, [r1]
 
 	/* Load next task's SP: */
 	ldr	r1, =next_tcb
 	ldr	r1, [r2]
 	ldr	r0, [r1]
-	msr	psp, r0
+	msr	msp, r0
 	
 	/* Refer to ProgMan, p. 27 for documentation of branching
 	 * to a magic number like this.
