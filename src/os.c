@@ -18,7 +18,7 @@ void LoopForever(void);
 /* Task Control Block type */
 typedef struct {
     void *sp;
-    void (*handler)(void);
+    /*void (*handler)(void);*/
 } TCB;
 
 /* Basic stack frame structure
@@ -55,12 +55,6 @@ void init_os(void) {
     NVIC_EnableIRQ(PendSV_IRQn);
     NVIC_SetPriority(SysTick_IRQn, 0xFF);
     NVIC_SetPriority(PendSV_IRQn, 0xFF);
-
-    /* Set the default TCB */
-    current_tcb = &TaskTable.tasks[0];
-
-    /* Enable SysTick */
-    SysTick_Config(SystemCoreClock);
 }
 
 void init_task(void (*handler)(void)) {
@@ -77,17 +71,31 @@ void init_task(void (*handler)(void)) {
 
     /* Initialize TCB */
     tcb->sp = new_stack;
-    tcb->handler = handler;
+    /*tcb->handler = handler;*/
 
     /* Update TaskTable metadata */
     TaskTable.tasks_num++;
 }
 
 void start_os(void) {
+    /* Set the default TCB
+     * We use the last task, so it's get stacked (even though it's already
+     * here), and then task #0 begins to execute. The advantage of
+     * this solution is that #0's stack doesn't get spoiled by some
+     * unnecessary calls to its handler
+     */
+    current_tcb = &TaskTable.tasks[TaskTable.tasks_num - 1];
+    TaskTable.current_task_num = 2;
+
+    /* Set the appriopriate Process Stack Pointer, force the processor
+     * to use it as its SP and flush the pipeline of the processor
+     */
     __set_PSP((uint32_t)current_tcb->sp);
-    __set_CONTROL(3);
+    __set_CONTROL(0x02);
     __ISB();
-    current_tcb->handler();
+    
+    /* Set SysTick interrupt period to 1s */
+    SysTick_Config(SystemCoreClock);
 }
 
 void SysTick_Handler(void) {
