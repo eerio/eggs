@@ -86,16 +86,16 @@ void start_os(void) {
      */
     current_tcb = &TaskTable.tasks[TaskTable.tasks_num - 1];
     TaskTable.current_task_num = 2;
+    
+    /* Set SysTick interrupt period to 1s */
+    SysTick_Config(SystemCoreClock);
 
     /* Set the appriopriate Process Stack Pointer, force the processor
      * to use it as its SP and flush the pipeline of the processor
      */
     __set_PSP((uint32_t)current_tcb->sp);
     __set_CONTROL(0x02);
-    __ISB();
-    
-    /* Set SysTick interrupt period to 1s */
-    SysTick_Config(SystemCoreClock);
+    __ISB(); 
 }
 
 void SysTick_Handler(void) {
