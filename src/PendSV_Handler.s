@@ -8,15 +8,16 @@
 .type PendSV_Handler, %function
 PendSV_Handler:
 	/* Disable interrupts - it's a critical code part */
-	// cpsid i
+	cpsid i
 
-	/* Save current task's SP: */
+	/* Save current task's SP
+	 * Both current_tcb and next_tcb are defined in os.c file */
 	mrs	r0, psp
 	ldr	r2, =current_tcb
 	ldr	r1, [r2]
 	str	r0, [r1]
 
-	/* Load next task's SP: */
+	/* Load next task's SP */
 	ldr	r2, =next_tcb
 	ldr	r1, [r2]
 	ldr	r0, [r1]
@@ -34,6 +35,7 @@ PendSV_Handler:
 	 * has to be executed as late as possible, to minimize the possibility
 	 * of another interrupt overtaking the control during context switching
 	 */
-	// cpsie i
-	bx	lr
+	ldr r0, =0xFFFFFFFD
+	cpsie i
+	bx	r0
 
