@@ -3,8 +3,8 @@
 .fpu softvfp
 .thumb
 
-.global start_os
-.type start_os, %function
+.global start_oos
+.type start_oos, %function
 start_os:
 /* Load &TCB to r2 */
 	ldr r2, =current_tcb
