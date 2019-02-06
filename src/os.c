@@ -83,6 +83,13 @@ void init_task(void (*handler)(void)) {
     TaskTable.tasks_num++;
 }
 
+void start_os(void) {
+    __set_PSP((uint32_t)current_tcb->sp);
+    __set_CONTROL(3);
+    __ISB();
+    current_tcb->handler();
+}
+
 void SysTick_Handler(void) {
     /* Update current TCB */
     current_tcb = &TaskTable.tasks[TaskTable.current_task_num];
