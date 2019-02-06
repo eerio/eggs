@@ -14,3 +14,6 @@ calling a function changes the stack and because of it i couldnt return
 to my previous stack frame when i started the os by calling tcb->handler()
 (probably)
 
+use stmdb in context switch, cause nvic pushes stackframe and then
+leaves SP at r0, lowest address. using stmia would corrupt that stackframe
+
