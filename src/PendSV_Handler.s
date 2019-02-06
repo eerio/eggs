@@ -3,24 +3,63 @@
 .fpu softvfp
 .thumb
 
+/* Both current_tcb and next_tcb are defined in os.c file */
+.extern current_tcb, next_tcb
 .global PendSV_Handler
 
 .type PendSV_Handler, %function
+/* Notes:
+ * Cortex-M0 in Thumb mode doesn't support:
+ * - STMDB instruction
+ * - STM without changing the value of base register: [!] option gotta be set
+ * - LDR/STR high registers (r8-r15) directly
+ */
 PendSV_Handler:
 	/* Disable interrupts - it's a critical code part */
 	cpsid i
 
-	/* Save current task's SP
-	 * Both current_tcb and next_tcb are defined in os.c file */
+	/* Save low registers higher on the stack */
 	mrs	r0, psp
+
+	/* Push r4-r7 */
+	//subs r0, #16
+	//stmia r0!, {r4-r7}
+
+	/* Push r8-r11 */
+	/*mov r4, r8
+	mov r5, r9
+	mov r6, r10
+	mov r7, r11
+	subs r0, #32
+	stmia r0!, {r4-r7}*/
+	
+	/* Move SP to the bottom of that frame */
+	//subs r0, #32
+
+	/* Save Process Stack Pointer to the current TCB */
 	ldr	r2, =current_tcb
 	ldr	r1, [r2]
 	str	r0, [r1]
 
-	/* Load next task's SP */
+	/* Load PSP of the next task */
 	ldr	r2, =next_tcb
 	ldr	r1, [r2]
 	ldr	r0, [r1]
+
+	/* Load r8-r11 */
+	/*ldmia r0!, {r4-r7}
+	mov r8, r4
+	mov r9, r5
+	mov r10, r6
+	mov r11, r7*/
+
+	/* Load r4-r7
+	 * Thanks to we pushed high registers lower on the stack, now they are
+	 * already un-stacked and we can freely overwrite r4-r7
+	 */
+	//ldmia r0!, {r4-r7}
+
+	/* Set the correct PSP for NVIC to load the correct context */
 	msr psp, r0
 	
 	/* Refer to ProgMan, p. 27 for documentation of branching

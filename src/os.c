@@ -18,6 +18,7 @@ typedef struct {
 } TCB;
 
 /* Basic stack frame structure */
+
 static struct {
     uint32_t r0;
     uint32_t r1;
@@ -29,6 +30,18 @@ static struct {
     uint32_t xPSR;
 } StackFrame = {0, 0, 0, 0, 0, (uint32_t)LoopForever, 0, DEFAULT_XPSR};
 
+/*
+static struct {
+    uint32_t xPSR;
+    uint32_t PC;
+    uint32_t LR;
+    uint32_t r12;
+    uint32_t r3;
+    uint32_t r2;
+    uint32_t r1;
+    uint32_t r0;
+} StackFrame = {DEFAULT_XPSR, 0, (uint32_t)LoopForever, 0, 0, 0, 0, 0};
+*/
 /* Table of all the tasks initialied */
 static struct {
     TCB tasks[MAX_TASKS];
@@ -60,8 +73,8 @@ void init_task(void (*handler)(void)) {
     StackFrame.PC = (uint32_t)handler;
     memcpy(new_stack, &StackFrame, sizeof StackFrame);
 
-    /* Initialize TCB */
-    tcb->sp = new_stack;
+    /* Initialize TCB, leave 32 bytes for 8 initial register values */
+    tcb->sp = new_stack;// - sizeof StackFrame;// + 32;
 
     /* Update TaskTable metadata */
     TaskTable.tasks_num++;
@@ -76,7 +89,9 @@ void start_os(void) {
      */
     TaskTable.current_task_num = TaskTable.tasks_num - 1;
     current_tcb = &TaskTable.tasks[TaskTable.current_task_num];
-    
+    /* We load no context from the stack yet, so omit this offset */
+    //current_tcb->sp -= 32;
+
     /* Set SysTick interrupt period to 1s */
     SysTick_Config(SystemCoreClock);
 
@@ -87,7 +102,11 @@ void start_os(void) {
     __set_CONTROL(0x02);
     __ISB();
 
-    /* Fetch the handler from current TCB and call it */
+    /* Fetch the handler from current TCB and call it
+     * 0x18 is the offset from the Frame Stack beginning and the PC val
+     * It corresponds to 6 registers that we want to omit:
+     * r0, r1, r2, r3, r12, lr
+     */
     void (**handler)(void) = current_tcb->sp + 0x18;
     (*(*handler))();
 }
