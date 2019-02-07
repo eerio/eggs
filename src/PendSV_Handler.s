@@ -10,9 +10,13 @@
 .type PendSV_Handler, %function
 /* Notes:
  * Cortex-M0 in Thumb mode doesn't support:
- * - STMDB instruction
- * - STM without changing the value of base register: [!] option gotta be set
- * - LDR/STR high registers (r8-r15) directly
+ *  - STMDB instruction
+ *  - STM without changing the value of base register: [!] option gotta be set
+ *  - LDR/STR high registers (r8-r15) directly
+ * Technical:
+ *  - We have to store low registers first to enable us to transport hi regs
+ *  - We have to load low at the end not to block them for transporting hi's
+ *  Thus, store low => store high => load high => load low
  */
 PendSV_Handler:
 	/* Disable interrupts - it's a critical code part */
@@ -22,19 +26,19 @@ PendSV_Handler:
 	mrs	r0, psp
 
 	/* Push r4-r7 */
-	//subs r0, #16
-	//stmia r0!, {r4-r7}
+	subs r0, #16
+	stmia r0!, {r4-r7}
 
 	/* Push r8-r11 */
-	/*mov r4, r8
+	mov r4, r8
 	mov r5, r9
 	mov r6, r10
 	mov r7, r11
 	subs r0, #32
-	stmia r0!, {r4-r7}*/
+	stmia r0!, {r4-r7}
 	
-	/* Move SP to the bottom of that frame */
-	//subs r0, #32
+	/* Return to the original sp */
+	adds r0, #16
 
 	/* Save Process Stack Pointer to the current TCB */
 	ldr	r2, =current_tcb
@@ -47,17 +51,15 @@ PendSV_Handler:
 	ldr	r0, [r1]
 
 	/* Load r8-r11 */
-	/*ldmia r0!, {r4-r7}
+	subs r0, #32
+	ldmia r0!, {r4-r7}
 	mov r8, r4
 	mov r9, r5
 	mov r10, r6
-	mov r11, r7*/
-
-	/* Load r4-r7
-	 * Thanks to we pushed high registers lower on the stack, now they are
-	 * already un-stacked and we can freely overwrite r4-r7
-	 */
-	//ldmia r0!, {r4-r7}
+	mov r11, r7	
+	
+	/* Load r4-r7 */
+	ldmia r0!, {r4-r7}
 
 	/* Set the correct PSP for NVIC to load the correct context */
 	msr psp, r0
