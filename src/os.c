@@ -17,31 +17,22 @@ typedef struct {
     void *sp;
 } TCB;
 
-/* Basic stack frame structure */
-
+/* Basic stack frame structure
+ * Since Cortex-M0 has a Full Descending stack and NVIC wants R0 at its SP
+ * and xPSR at offset SP+0x1C, the order of these fields cannot be
+ * changed or reversed - it's natural in Cortex-M0 environment this way
+ */
 static struct {
-    uint32_t r0;
+    uint32_t r0; /* Lowest address */
     uint32_t r1;
     uint32_t r2;
     uint32_t r3;
     uint32_t r12;
     uint32_t LR;
     uint32_t PC;
-    uint32_t xPSR;
+    uint32_t xPSR; /* Highest address, <StackFrame> + 0x1C */
 } StackFrame = {0, 0, 0, 0, 0, (uint32_t)LoopForever, 0, DEFAULT_XPSR};
 
-/*
-static struct {
-    uint32_t xPSR;
-    uint32_t PC;
-    uint32_t LR;
-    uint32_t r12;
-    uint32_t r3;
-    uint32_t r2;
-    uint32_t r1;
-    uint32_t r0;
-} StackFrame = {DEFAULT_XPSR, 0, (uint32_t)LoopForever, 0, 0, 0, 0, 0};
-*/
 /* Table of all the tasks initialied */
 static struct {
     TCB tasks[MAX_TASKS];
@@ -69,12 +60,12 @@ void init_task(void (*handler)(void)) {
     void *new_stack = calloc(STACK_SIZE, 1U);
     if (!new_stack) while(1) { /* UNABLE TO ALLOCATE A NEW STACK */ }
     
+    /* Initialize TCB, leave 32 bytes for 8 initial register values */
+    tcb->sp = new_stack + STACK_SIZE - sizeof StackFrame;
+    
     /* Initialize stack */
     StackFrame.PC = (uint32_t)handler;
-    memcpy(new_stack, &StackFrame, sizeof StackFrame);
-
-    /* Initialize TCB, leave 32 bytes for 8 initial register values */
-    tcb->sp = new_stack;// - sizeof StackFrame;// + 32;
+    memcpy(tcb->sp, &StackFrame, sizeof StackFrame);
 
     /* Update TaskTable metadata */
     TaskTable.tasks_num++;
@@ -89,8 +80,8 @@ void start_os(void) {
      */
     TaskTable.current_task_num = TaskTable.tasks_num - 1;
     current_tcb = &TaskTable.tasks[TaskTable.current_task_num];
-    /* We load no context from the stack yet, so omit this offset */
-    //current_tcb->sp -= 32;
+    /* We load no context from the stack yet, so omit default offset */
+    //current_tcb->sp += 32;
 
     /* Set SysTick interrupt period to 1s */
     SysTick_Config(SystemCoreClock);
