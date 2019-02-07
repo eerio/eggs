@@ -24,20 +24,22 @@ void delay (unsigned int time) {
 /* TODO: Shouldn't there be some irq-disables/enables? */
 void handler_blinking_fast(void) {
     while(1) {
-        LED_ON();
+        GPIOA->ODR ^= (1 << 5);
+        delay(100000);
     }
 }
 
 void handler_blinking_medium(void) {
     while(1) {
-        LED_TOGGLE();
-        delay(30000);
+        GPIOA->ODR ^= (1 << 6);
+        delay(50000);
     }
 }
 
 void handler_blinking_slow(void) {
     while(1) {
-        LED_OFF();
+        GPIOA->ODR ^= (1 << 7);
+        delay(200000);
     }
 }
 
