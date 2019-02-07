@@ -61,7 +61,7 @@ void init_task(void (*handler)(void)) {
     if (!new_stack) while(1) { /* UNABLE TO ALLOCATE A NEW STACK */ }
     
     /* Initialize TCB, leave 32 bytes for 8 initial register values */
-    tcb->sp = new_stack + STACK_SIZE - sizeof StackFrame;
+    tcb->sp = new_stack + STACK_SIZE - sizeof StackFrame - 32;
     
     /* Initialize stack */
     StackFrame.PC = (uint32_t)handler;
@@ -80,11 +80,9 @@ void start_os(void) {
      */
     TaskTable.current_task_num = TaskTable.tasks_num - 1;
     current_tcb = &TaskTable.tasks[TaskTable.current_task_num];
-    /* We load no context from the stack yet, so omit default offset */
-    //current_tcb->sp += 32;
 
-    /* Set SysTick interrupt period to 1s */
-    SysTick_Config(SystemCoreClock);
+    /* Set SysTick interrupt period to *not*1s */
+    SysTick_Config(SystemCoreClock >> 8);
 
     /* Set the appriopriate Process Stack Pointer, force the processor
      * to use it as its SP and flush the pipeline of the processor
