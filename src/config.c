@@ -34,16 +34,16 @@ void setup_spi(void) {
     GPIOA->MODER |= GPIO_MODER_MODER7_1;
 
     /* Select push-pull mode */
-    GPIOA->OTYPER &= 0xFFFFFF0F
+    GPIOA->OTYPER &= 0xFFFFFF0F;
 
     /* Select highest frequency*/
-    GPIOA->OSPEEDR |= 0x0000FF00
+    GPIOA->OSPEEDR |= 0x0000FF00;
     
     /* Select pull-up resistors for SCK, MISO, MOSI */
-    GPIOA->PUPDR &= 0xFFFF00FF
-    GPIOA->PUPDR |= GPIOA_PUPDR_PUPDR5_0;
-    GPIOA->PUPDR |= GPIOA_PUPDR_PUPDR6_0;
-    GPIOA->PUPDR |= GPIOA_PUPDR_PUPDR7_0;
+    GPIOA->PUPDR &= 0xFFFF00FF;
+    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR5_0;
+    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR6_0;
+    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;
 
     /* Select Alternate Function #0 for SCK, MISO, MOSI */
     GPIOA->AFR[0] &= 0x000FFFFF;
@@ -59,8 +59,8 @@ void setup_spi(void) {
     SPI1->CR1 |= SPI_CR1_MSTR;
 
     /* Transfer data length: 8-bit */
-    SPI1->CR2 &= ~SPI_CR1_DS;
-    SPI1->CR2 |= 0b0111 << SPI_CR1_DS_Pos;
+    SPI1->CR2 &= ~SPI_CR2_DS;
+    SPI1->CR2 |= 0b0111 << SPI_CR2_DS_Pos;
 
     /* RXNE if the FIFO level >= 8 bit */
     SPI1->CR2 |= SPI_CR2_FRXTH;
