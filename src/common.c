@@ -12,6 +12,12 @@
 #define LED_OFF() (LED_PORT->BRR |= (1 << LED_PIN))
 #define LED_TOGGLE() (LED_PORT->ODR ^= (1 << LED_PIN))
 
+/* Send byte by SPI */
+void SPI_send(uint8_t data) {
+    while (SPI1->SR & SPI_SR_BSY) {}
+    SPI1->DR = data;
+}
+
 /* TODO: Make it timer- and interruption-based, so it's accurate,
  *          [time-in-seconds-or-minutes-or-sth]-programmable and
  *          another interrupts occuring will not affect it
