@@ -14,10 +14,29 @@
 #include<os.h>
 #include<common.h>
 
+void OS_setup(void);
+
 
 int main(void) {
     /* Configure board's peripherals */
     init_sys();
+
+    char msg[] = "Hello!\n";
+    while(1) {
+        for (int i=0; i < 7; i++) {
+            GPIOA->BRR |= (1 << 4);
+            SPI1->DR = msg[i];
+            GPIOA->BSRR |= (1 << 4);
+        }
+        delay(250000);
+    }
+
+    /* Main thread after return from the main function goes to an infinite
+     * loop in the startup_stm32f091xc.s file */
+    return 0;
+}
+
+void OS_setup(void) {
     /* Setup the operating system environment */
     init_os();
 
@@ -28,9 +47,5 @@ int main(void) {
 
     /* Start executing the threads */
     start_os();
-
-    /* Main thread after return from the main function goes to an infinite
-     * loop in the startup_stm32f091xc.s file */
-    return 0;
 }
 
