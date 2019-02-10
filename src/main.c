@@ -13,6 +13,7 @@
 #include<config.h>
 #include<os.h>
 #include<common.h>
+#include<spi.h>
 
 void OS_setup(void);
 

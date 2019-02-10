@@ -5,9 +5,6 @@
  */
 #include<stm32f0xx.h>
 
-/* Send byte by SPI1 */
-void SPI_send(uint8_t);
-
 /* Simplest delay routine possible, it counts down n times */
 void delay(unsigned int);
 

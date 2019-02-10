@@ -4,6 +4,7 @@
  * github.com@eerio
  */
 #include<stm32f0xx.h>
+#include<spi.h>
 
 /* Send byte by SPI
  * note: it actually sends 16 bits either way, so after <data> byte
