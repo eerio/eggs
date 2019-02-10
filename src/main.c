@@ -28,7 +28,7 @@ int main(void) {
     }
     
     /* Disable SPI */
-    // SPI1->CR1 &= ~SPI_CR1_SPE;
+    SPI1->CR1 &= ~SPI_CR1_SPE;
 
     /* Main thread after return from the main function goes to an infinite
      * loop in the startup_stm32f091xc.s file */
