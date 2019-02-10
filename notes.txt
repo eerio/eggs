@@ -20,3 +20,4 @@ leaves SP at r0, lowest address. using stmia would corrupt that stackframe
 spi: clock, despite being set to be 0 at idle and no push-down
 nor pull-up resistor, its 1 at idle. idk why, ill conform to it and set it to be 1 at idle + set a push-up resistor
 
+Copmiler it wth -std=c99 cause CMSIS libraries do not support ANSI C stndard
