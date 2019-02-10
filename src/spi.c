@@ -5,6 +5,16 @@
  */
 #include<stm32f0xx.h>
 
+/* Send byte by SPI
+ * note: it actually sends 16 bits either way, so after <data> byte
+ * a null-byte will be sent. TODO: it should be clear whether its 8
+ * or 16 bits communication
+ * */
+void SPI_send(uint8_t data) {
+    while (SPI1->SR & SPI_SR_BSY) {}
+    SPI1->DR = data;
+}
+
 /* Mode: full-duplex, master
  * Pins:
  *  - PA4: NSS (Slave Select), mode: output
