@@ -17,3 +17,6 @@ to my previous stack frame when i started the os by calling tcb->handler()
 use stmdb in context switch, cause nvic pushes stackframe and then
 leaves SP at r0, lowest address. using stmia would corrupt that stackframe
 
+spi: clock, despite being set to be 0 at idle and no push-down
+nor pull-up resistor, its 1 at idle. idk why, ill conform to it and set it to be 1 at idle + set a push-up resistor
+
