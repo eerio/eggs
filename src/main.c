@@ -19,17 +19,20 @@ void OS_setup(void);
 
 int main(void) {
     /* Configure board's peripherals */
+    SPI1->DR = 'A';
+    delay(10000);
     init_sys();
+    delay(10000);
 
     char msg[] = "Hello!\n";
-    while(1) {
-        for (int i=0; i < 7; i++) {
-            GPIOA->BRR |= (1 << 4);
-            SPI1->DR = msg[i];
-            GPIOA->BSRR |= (1 << 4);
-        }
-        delay(250000);
+
+    for (unsigned int i=0; i < sizeof(msg) / sizeof(char); ++i) {
+        SPI_send(msg[i]);
+        delay(50000);
     }
+    
+    /* Disable SPI */
+    //SPI1->CR1 &= ~SPI_CR1_SPE;
 
     /* Main thread after return from the main function goes to an infinite
      * loop in the startup_stm32f091xc.s file */

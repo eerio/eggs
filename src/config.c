@@ -40,30 +40,55 @@ void setup_spi(void) {
     GPIOA->OSPEEDR |= 0x0000FF00;
     
     /* Select pull-up resistors for SCK, MISO, MOSI */
-    GPIOA->PUPDR &= 0xFFFF00FF;
-    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR5_0;
-    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR6_0;
-    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;
+    //GPIOA->PUPDR &= 0xFFFF00FF;
+    /* pyll-down for clock */
+    //GPIOA->PUPDR |= 2 << 10;
+    //GPIOA->PUPDR |= GPIO_PUPDR_PUPDR5_0;
+    //GPIOA->PUPDR |= GPIO_PUPDR_PUPDR6_0;
+    //GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;
 
     /* Select Alternate Function #0 for SCK, MISO, MOSI */
     GPIOA->AFR[0] &= 0x000FFFFF;
 
-    /* Enable SPI #1 */
+    /* Enable SPI #1 clock */
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-    
+
+    /* Data mode: 2-line unidirectional */
+    SPI1->CR1 &= ~SPI_CR1_BIDIMODE;
+    /* Disable CRC */
+    SPI1->CR1 &= ~SPI_CR1_CRCEN;
+    /* Full-duplex mode */
+    SPI1->CR1 &= ~SPI_CR1_RXONLY;
+    /* Software slave management */
+    SPI1->CR1 |= SPI_CR1_SSM;
+    /* Internal slave select */
+    SPI1->CR1 |= SPI_CR1_SSI;
+    /* MSB first */
+    SPI1->CR1 &= ~SPI_CR1_LSBFIRST;
     /* Set baudrate to PCLK / 32 */
     SPI1->CR1 &= SPI_CR1_BR;
     SPI1->CR1 |= (0b100) << SPI_CR1_BR_Pos;
-
     /* Master configuration */
     SPI1->CR1 |= SPI_CR1_MSTR;
-
-    /* Transfer data length: 8-bit */
-    SPI1->CR2 &= ~SPI_CR2_DS;
-    SPI1->CR2 |= 0b0111 << SPI_CR2_DS_Pos;
+    /* Clock to 0 when idle */
+    SPI1->CR1 &= ~SPI_CR1_CPOL;
+    /* First clock transition is the first data capture edge */
+    SPI1->CR1 &= ~SPI_CR1_CPHA;
 
     /* RXNE if the FIFO level >= 8 bit */
     SPI1->CR2 |= SPI_CR2_FRXTH;
+    /* Transfer data length: 8-bit */
+    SPI1->CR2 &= ~SPI_CR2_DS;
+    SPI1->CR2 |= 0b0111 << SPI_CR2_DS_Pos;
+    /* Frame format: SPI Motorola mode */
+    SPI1->CR2 &= ~SPI_CR2_FRF;
+    /* Send NSS pulse between two data transfers */
+    SPI1->CR2 |= SPI_CR2_NSSP;
+    /* Slave Select Output enable */
+    SPI1->CR2 |= SPI_CR2_SSOE;
+
+    /* Enable SPI */
+    SPI1->CR1 |= SPI_CR1_SPE;
 }
 
 /* Enable GPIOA and set the correct pin modes for PA5, PA6 and PA7 */
