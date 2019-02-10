@@ -84,8 +84,8 @@ void setup_spi(void) {
     SPI1->CR2 &= ~SPI_CR2_FRF;
     /* Send NSS pulse between two data transfers */
     SPI1->CR2 |= SPI_CR2_NSSP;
-    /* Slave Select Output enable */
-    SPI1->CR2 |= SPI_CR2_SSOE;
+    /* Slave Select Output disable */
+    SPI1->CR2 &= ~SPI_CR2_SSOE;
 
     /* Enable SPI */
     SPI1->CR1 |= SPI_CR1_SPE;
