@@ -15,7 +15,9 @@
 /* Send byte by SPI */
 void SPI_send(uint8_t data) {
     while (SPI1->SR & SPI_SR_BSY) {}
+    GPIOA->ODR &= ~(1 << 4);
     SPI1->DR = data;
+    GPIOA->ODR |= (1 << 4);
 }
 
 /* TODO: Make it timer- and interruption-based, so it's accurate,
