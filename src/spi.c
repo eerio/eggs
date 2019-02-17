@@ -12,8 +12,10 @@
  * or 16 bits communication
  * */
 void SPI_send(uint8_t data) {
+    GPIOA->ODR |= (1 << 4);
     while (SPI1->SR & SPI_SR_BSY) {}
     SPI1->DR = data;
+    GPIOA->ODR &= ~(1 << 4);
 }
 
 /* Mode: full-duplex, master
