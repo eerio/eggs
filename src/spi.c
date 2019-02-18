@@ -32,7 +32,7 @@ void SPI_send(uint8_t data) {
  *  - 8 bits per transfer
  *  - clock is low when inactive (CPOL = 0)
  *  - data is valid on clock leading edge (CPHA = 0)
- *  - enable line is active low
+ *  - enable line is active high
  */
 void setup_spi(void) {
     /* Enable GPIO port A */
