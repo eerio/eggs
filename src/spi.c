@@ -47,13 +47,15 @@ void setup_spi(void) {
     GPIOA->MODER |= GPIO_MODER_MODER7_1;
 
     /* Select push-pull mode */
-    GPIOA->OTYPER &= 0xFFFFFF0F;
+    GPIOA->OTYPER &= ~GPIO_OTYPER_OTYPER5;
+    GPIOA->OTYPER &= ~GPIO_OTYPER_OTYPER6;
+    GPIOA->OTYPER &= ~GPIO_OTYPER_OTYPER7;
 
     /* Select highest frequency*/
     GPIOA->OSPEEDR |= 0x0000FF00;
     
     /* Select pull-up resistors for SCK, MISO, MOSI */
-    GPIOA->PUPDR &= 0xFFFF00FF;
+    GPIOA->PUPDR &= 0xFFFF03FF;
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR5_0;
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR6_0;
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;
