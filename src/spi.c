@@ -5,6 +5,7 @@
  */
 #include<stm32f0xx.h>
 #include<spi.h>
+#include<common.h>
 
 /* Send a sequence of bytes via SPI
  * CS is set by default
@@ -12,7 +13,7 @@
 void SPI_send(unsigned int n, uint8_t data[]) {
     GPIOA->ODR &= ~(1 << 4);
     for (unsigned int i=0; i < n; ++i) {
-        while (SPI1->SR & SPI_SR_BSY) {}
+        while ((SPI1->SR & SPI_SR_TXE) == 0) {}
         SPI1->DR = data[i];
     }
     GPIOA->ODR |= (1 << 4);
