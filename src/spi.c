@@ -10,12 +10,14 @@
  * note: it actually sends 16 bits either way, so after <data> byte
  * a null-byte will be sent. TODO: it should be clear whether its 8
  * or 16 bits communication
- * */
+ *
+ * CS is set by default
+ */
 void SPI_send(uint8_t data) {
-    GPIOA->ODR |= (1 << 4);
+    GPIOA->ODR &= ~(1 << 4);
     while (SPI1->SR & SPI_SR_BSY) {}
     SPI1->DR = data;
-    GPIOA->ODR &= ~(1 << 4);
+    GPIOA->ODR |= (1 << 4);
 }
 
 /* Mode: full-duplex, master
