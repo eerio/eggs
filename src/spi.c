@@ -32,46 +32,35 @@ void SPI_send(unsigned int n, uint8_t data[]) {
 void setup_spi(void) {
     /* Enable GPIO port A */
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-    /* NSS, SCK, MISO, MOSI: Alternate Function mode*/
+    
+    /* Set AF0 mode for every pin */
     GPIOA->MODER &= 0xFFFF00FF;
     GPIOA->MODER |= GPIO_MODER_MODER4_1;
     GPIOA->MODER |= GPIO_MODER_MODER5_1;
     GPIOA->MODER |= GPIO_MODER_MODER6_1;
     GPIOA->MODER |= GPIO_MODER_MODER7_1;
+    /* Select Alternate Function #0 for SCK, MISO, MOSI */
+    GPIOA->AFR[0] &= 0x0000FFFF;
 
     /* Select push-pull mode */
-    GPIOA->OTYPER &= ~GPIO_OTYPER_OT_4;
-    GPIOA->OTYPER &= ~GPIO_OTYPER_OT_5;
-    GPIOA->OTYPER &= ~GPIO_OTYPER_OT_6;
-    GPIOA->OTYPER &= ~GPIO_OTYPER_OT_7;
-
-    /* Select highest frequency*/
-    GPIOA->OSPEEDR |= 0x0000FF00;
-    
-    /* Select pull-up resistors for SCK, MISO, MOSI */
-    GPIOA->PUPDR &= 0xFFFF03FF;
+    GPIOA->OTYPER &= 0xFFFFFF0F;
+    /* Select pull-up resistors for NSS, SCK, MISO, MOSI */
+    GPIOA->PUPDR &= 0xFFFF00FF;
+    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR4_0;
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR5_0;
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR6_0;
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;
-
-    /* Select Alternate Function #0 for SCK, MISO, MOSI */
-    GPIOA->AFR[0] &= 0x0000FFFF;
+    /* Select highest frequency*/
+    GPIOA->OSPEEDR |= 0x0000FF00;
+    
 
     /* Enable SPI #1 clock */
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 
     /* Data mode: 2-line unidirectional */
     SPI1->CR1 &= ~SPI_CR1_BIDIMODE;
-    /* Disable CRC */
-    SPI1->CR1 &= ~SPI_CR1_CRCEN;
     /* Full-duplex mode */
     SPI1->CR1 &= ~SPI_CR1_RXONLY;
-    /* Hardware slave management */
-    SPI1->CR1 &= ~SPI_CR1_SSM;
-    /* Internal slave select (redundant with SSM bit reset) */
-    // SPI1->CR1 |= SPI_CR1_SSI;
-    /* MSB first */
-    SPI1->CR1 &= ~SPI_CR1_LSBFIRST;
     /* Set freq to 8Mhz / 32 = 250kHz */
     SPI1->CR1 &= SPI_CR1_BR;
     SPI1->CR1 |= (0b100) << SPI_CR1_BR_Pos;
@@ -81,14 +70,24 @@ void setup_spi(void) {
     SPI1->CR1 &= ~SPI_CR1_CPOL;
     /* First clock transition is the first data capture edge */
     SPI1->CR1 &= ~SPI_CR1_CPHA;
-
-    /* RXNE if the FIFO level >= 8 bit */
-    SPI1->CR2 |= SPI_CR2_FRXTH;
+    
+    /* MSB first */
+    SPI1->CR1 &= ~SPI_CR1_LSBFIRST;
+    /* Frame format: SPI Motorola mode */
+    SPI1->CR2 &= ~SPI_CR2_FRF;
     /* Transfer data length: 8-bit */
     SPI1->CR2 &= ~SPI_CR2_DS;
     SPI1->CR2 |= 0b0111 << SPI_CR2_DS_Pos;
-    /* Frame format: SPI Motorola mode */
-    SPI1->CR2 &= ~SPI_CR2_FRF;
+    
+    /* Disable CRC */
+    SPI1->CR1 &= ~SPI_CR1_CRCEN;
+    /* RXNE if the FIFO level >= 8 bit */
+    SPI1->CR2 |= SPI_CR2_FRXTH;
+    
+    /* Hardware slave management */
+    SPI1->CR1 &= ~SPI_CR1_SSM;
+    /* Internal slave select (redundant with SSM bit reset) */
+    // SPI1->CR1 |= SPI_CR1_SSI;
     /* Send NSS pulse between two data transfers */
     SPI1->CR2 |= SPI_CR2_NSSP;
     /* Slave Select Output disable */
