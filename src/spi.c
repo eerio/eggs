@@ -7,45 +7,40 @@
 #include<spi.h>
 #include<common.h>
 
-/* Send a sequence of bytes via SPI
- * CS is set by default
- */
+/* Send a sequence of bytes via SPI */
 void SPI_send(unsigned int n, uint8_t data[]) {
-    GPIOA->ODR &= ~(1 << 4);
     for (unsigned int i=0; i < n; ++i) {
         while ((SPI1->SR & SPI_SR_TXE) == 0) {}
         SPI1->DR = data[i];
     }
-    GPIOA->ODR |= (1 << 4);
 }
 
 /* Mode: full-duplex, master
- * Pins:
- *  - PA4: NSS (Slave Select), mode: output
- *  - PA5: SCK, mode: AF0
- *  - PA6: MISO, mode: AF0
- *  - PA7: MOSI, mode: AF0
+ * Pins (all in AF0 mode):
+ *  - PA4: NSS (Slave Select)
+ *  - PA5: SCK
+ *  - PA6: MISO
+ *  - PA7: MOSI
  * Procedure of SPI configuration: RM p. 765
  * SPI config:
  *  - MSB first
  *  - 8 bits per transfer
  *  - clock is low when inactive (CPOL = 0)
  *  - data is valid on clock leading edge (CPHA = 0)
- *  - enable line is active high
+ *  - hardware NSS line management
  */
 void setup_spi(void) {
     /* Enable GPIO port A */
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-    /* SCK, MISO, MOSI: Alternate Function mode
-     * NSS: Output mode
-     */
-    GPIOA->MODER &= 0xFFFF00FF;  /* Clear GPIOA->MODER bits [15:8] */
-    GPIOA->MODER |= GPIO_MODER_MODER4_0;
+    /* NSS, SCK, MISO, MOSI: Alternate Function mode*/
+    GPIOA->MODER &= 0xFFFF00FF;
+    GPIOA->MODER |= GPIO_MODER_MODER4_1;
     GPIOA->MODER |= GPIO_MODER_MODER5_1;
     GPIOA->MODER |= GPIO_MODER_MODER6_1;
     GPIOA->MODER |= GPIO_MODER_MODER7_1;
 
     /* Select push-pull mode */
+    GPIOA->OTYPER &= ~GPIO_OTYPER_OT_4;
     GPIOA->OTYPER &= ~GPIO_OTYPER_OT_5;
     GPIOA->OTYPER &= ~GPIO_OTYPER_OT_6;
     GPIOA->OTYPER &= ~GPIO_OTYPER_OT_7;
@@ -60,7 +55,7 @@ void setup_spi(void) {
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;
 
     /* Select Alternate Function #0 for SCK, MISO, MOSI */
-    GPIOA->AFR[0] &= 0x000FFFFF;
+    GPIOA->AFR[0] &= 0x0000FFFF;
 
     /* Enable SPI #1 clock */
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
@@ -71,10 +66,10 @@ void setup_spi(void) {
     SPI1->CR1 &= ~SPI_CR1_CRCEN;
     /* Full-duplex mode */
     SPI1->CR1 &= ~SPI_CR1_RXONLY;
-    /* Software slave management */
-    SPI1->CR1 |= SPI_CR1_SSM;
-    /* Internal slave select */
-    SPI1->CR1 |= SPI_CR1_SSI;
+    /* Hardware slave management */
+    SPI1->CR1 &= ~SPI_CR1_SSM;
+    /* Internal slave select (redundant with SSM bit reset) */
+    // SPI1->CR1 |= SPI_CR1_SSI;
     /* MSB first */
     SPI1->CR1 &= ~SPI_CR1_LSBFIRST;
     /* Set freq to 8Mhz / 32 = 250kHz */
@@ -97,7 +92,7 @@ void setup_spi(void) {
     /* Send NSS pulse between two data transfers */
     SPI1->CR2 |= SPI_CR2_NSSP;
     /* Slave Select Output disable */
-    SPI1->CR2 &= ~SPI_CR2_SSOE;
+    SPI1->CR2 |= SPI_CR2_SSOE;
 
     /* Enable SPI */
     SPI1->CR1 |= SPI_CR1_SPE;
