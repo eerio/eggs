@@ -23,7 +23,7 @@ int main(void) {
     init_sys();
 
     uint8_t msg[] = "Hello!\n";
-    for (unsigned int i=0; i < sizeof(msg) / sizeof(char); ++i) {
+    for(int i=0; i < 8; ++i) {
         SPI_send(1, &msg[i]);
         delay(10000);
     }
