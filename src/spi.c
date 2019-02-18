@@ -6,17 +6,15 @@
 #include<stm32f0xx.h>
 #include<spi.h>
 
-/* Send byte by SPI
- * note: it actually sends 16 bits either way, so after <data> byte
- * a null-byte will be sent. TODO: it should be clear whether its 8
- * or 16 bits communication
- *
+/* Send a sequence of bytes via SPI
  * CS is set by default
  */
-void SPI_send(uint8_t data) {
+void SPI_send(unsigned int n, uint8_t data[]) {
     GPIOA->ODR &= ~(1 << 4);
-    while (SPI1->SR & SPI_SR_BSY) {}
-    SPI1->DR = data;
+    for (unsigned int i=0; i < n; ++i) {
+        while (SPI1->SR & SPI_SR_BSY) {}
+        SPI1->DR = data[i];
+    }
     GPIOA->ODR |= (1 << 4);
 }
 

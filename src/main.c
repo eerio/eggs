@@ -22,9 +22,9 @@ int main(void) {
     /* Configure board's peripherals */
     init_sys();
 
-    char msg[] = "Hello!\n";
+    uint8_t msg[] = "Hello!\n";
     for (unsigned int i=0; i < sizeof(msg) / sizeof(char); ++i) {
-        SPI_send(msg[i]);
+        SPI_send(1, &msg[i]);
         delay(10000);
     }
     
