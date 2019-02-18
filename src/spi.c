@@ -76,7 +76,7 @@ void setup_spi(void) {
     SPI1->CR1 |= SPI_CR1_SSI;
     /* MSB first */
     SPI1->CR1 &= ~SPI_CR1_LSBFIRST;
-    /* Set baudrate to PCLK / 32 */
+    /* Set freq to 8Mhz / 32 = 250kHz */
     SPI1->CR1 &= SPI_CR1_BR;
     SPI1->CR1 |= (0b100) << SPI_CR1_BR_Pos;
     /* Master configuration */
