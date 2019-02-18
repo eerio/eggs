@@ -47,9 +47,9 @@ void setup_spi(void) {
     GPIOA->MODER |= GPIO_MODER_MODER7_1;
 
     /* Select push-pull mode */
-    GPIOA->OTYPER &= ~GPIO_OTYPER_OTYPER5;
-    GPIOA->OTYPER &= ~GPIO_OTYPER_OTYPER6;
-    GPIOA->OTYPER &= ~GPIO_OTYPER_OTYPER7;
+    GPIOA->OTYPER &= ~GPIO_OTYPER_OT_5;
+    GPIOA->OTYPER &= ~GPIO_OTYPER_OT_6;
+    GPIOA->OTYPER &= ~GPIO_OTYPER_OT_7;
 
     /* Select highest frequency*/
     GPIOA->OSPEEDR |= 0x0000FF00;
