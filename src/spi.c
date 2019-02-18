@@ -11,7 +11,7 @@
 void SPI_send(unsigned int n, uint8_t data[]) {
     for (unsigned int i=0; i < n; ++i) {
         while ((SPI1->SR & SPI_SR_TXE) == 0) {}
-        SPI1->DR = data[i];
+        SPI1->DR = data[i] << 8;
     }
 }
 
@@ -32,6 +32,8 @@ void SPI_send(unsigned int n, uint8_t data[]) {
 void setup_spi(void) {
     /* Enable GPIO port A */
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+    /* Enable SPI #1 clock */
+    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
     
     /* Set AF0 mode for every pin */
     GPIOA->MODER &= 0xFFFF00FF;
@@ -52,10 +54,7 @@ void setup_spi(void) {
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;
     /* Select highest frequency*/
     GPIOA->OSPEEDR |= 0x0000FF00;
-    
 
-    /* Enable SPI #1 clock */
-    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 
     /* Data mode: 2-line unidirectional */
     SPI1->CR1 &= ~SPI_CR1_BIDIMODE;
@@ -90,10 +89,13 @@ void setup_spi(void) {
     // SPI1->CR1 |= SPI_CR1_SSI;
     /* Send NSS pulse between two data transfers */
     SPI1->CR2 |= SPI_CR2_NSSP;
-    /* Slave Select Output disable */
-    SPI1->CR2 |= SPI_CR2_SSOE;
 
     /* Enable SPI */
+    delay(1000);
     SPI1->CR1 |= SPI_CR1_SPE;
+
+
+    /* Slave Select Output enable */
+    SPI1->CR2 |= SPI_CR2_SSOE;
 }
 

@@ -25,7 +25,6 @@ int main(void) {
     uint8_t msg[] = "Hello!\n";
     for(int i=0; i < 8; ++i) {
         SPI_send(1, &msg[i]);
-        delay(10000);
     }
     
     /* Disable SPI */
