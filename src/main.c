@@ -23,7 +23,7 @@ int main(void) {
     init_sys();
 
     uint8_t msg[] = "Hello!\n";
-    for(int i=0; i < 8; ++i) {
+    for(int i=0; i < 8+2 /* ? */; ++i) {
         //SPI_TX_buffer[i] = msg[i];
         while((SPI1->SR & SPI_SR_TXE) == 0) {}
         SPI1->DR = msg[i];
