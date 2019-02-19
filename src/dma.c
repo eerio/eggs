@@ -3,17 +3,48 @@
 #include<dma.h>
 
 void configure_DMA(void) {
-    setup_DMA_RX();
+    //setup_DMA_RX();
     setup_DMA_TX();
 }
 
+/* Transfer data from SPI1 TX container in memory to SPI1 TX FIFO */
+void setup_DMA_TX(void) {
+    /* Perform each time 1 transfer from SPI TX buffer to SPI1->DR */
+    if ((DMA_TX->CCR & DMA_CCR_EN) == 0) {
+        //DMA_TX->CPAR = (uint32_t)(&(SPI1->DR));
+        DMA_TX->CPAR = (uint32_t)(&SPI_RX_buffer);
+        DMA_TX->CMAR = (uint32_t)(&SPI_TX_buffer);
+        DMA_TX->CNDTR |= (1U << DMA_CNDTR_NDT_Pos);
+    }
+
+    /* Memory to peripheral mode */
+    //DMA_TX->CCR &= ~DMA_CCR_MEM2MEM;
+    DMA_TX->CCR |= DMA_CCR_MEM2MEM;
+    /* Channel priority: Very high */
+    DMA_TX->CCR |= DMA_CCR_PL;
+    /* Data size in TX FIFO: 8 bits */
+    DMA_TX->CCR &= ~DMA_CCR_MSIZE;
+    /* Data size in SPI DR: 8 bits */
+    DMA_TX->CCR &= ~DMA_CCR_PSIZE;
+    //DMA_TX->CCR |= DMA_CCR_PSIZE_0;
+    /* Increment memory address */
+    DMA_TX->CCR |= DMA_CCR_MINC;
+    /* Don't increment peripheral address */
+    //DMA_TX->CCR &= ~DMA_CCR_PINC;
+    DMA_TX->CCR |= DMA_CCR_PINC;
+    /* No circular mode */
+    DMA_TX->CCR &= ~DMA_CCR_CIRC;
+    /* Transfer direction: Memory to peripheral */
+    DMA_TX->CCR |= DMA_CCR_DIR;
+
+    /* Enable channel */
+    DMA_TX->CCR |= DMA_CCR_EN;
+}
+
+
 /* Transfer data from SPI1 RX FIFO to SPI RX buffer in memory */
 void setup_DMA_RX(void) {
-    // TODO: jaki kurwa ma sens ustawianie aliasu jak uzywam dma1 tu i tak
-    RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-    
     /* Perform each time 1 transfer from SPI1 RX FIFO to the buffer */
-    // CxS[3:0]: 0011
     if ((DMA_RX->CCR & DMA_CCR_EN) == 0) {
         DMA_RX->CPAR = (uint32_t)(&(SPI1->DR));
         DMA_RX->CMAR = (uint32_t)(&SPI_RX_buffer);
@@ -39,38 +70,5 @@ void setup_DMA_RX(void) {
 
     /* Enable channel */
     DMA_RX->CCR |= DMA_CCR_EN;
-}
-
-/* Transfer data from SPI1 TX container in memory to SPI1 TX FIFO */
-void setup_DMA_TX(void) {
-    RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-
-    /* Perform each time 1 transfer from SPI TX buffer to SPI1->DR */
-    if ((DMA_TX->CCR & DMA_CCR_EN) == 0) {
-        DMA_TX->CPAR = (uint32_t)(&(SPI1->DR));
-        DMA_TX->CMAR = (uint32_t)(&SPI_TX_buffer);
-        DMA_TX->CNDTR |= (1U << DMA_CNDTR_NDT_Pos);
-    }
-
-    /* Memory to peripheral mode */
-    DMA_TX->CCR &= ~DMA_CCR_MEM2MEM;
-    /* Channel priority: Very high */
-    DMA_TX->CCR |= DMA_CCR_PL;
-    /* Data size in TX FIFO: 8 bits */
-    DMA_TX->CCR &= ~DMA_CCR_MSIZE;
-    /* Data size in SPI DR: 16 bits */
-    DMA_TX->CCR &= ~DMA_CCR_PSIZE;
-    DMA_TX->CCR |= DMA_CCR_PSIZE_0;
-    /* Increment memory address */
-    DMA_TX->CCR |= DMA_CCR_MINC;
-    /* Don't increment peripheral address */
-    DMA_TX->CCR &= ~DMA_CCR_PINC;
-    /* No circular mode */
-    DMA_TX->CCR &= ~DMA_CCR_CIRC;
-    /* Transfer direction: Memory to peripheral */
-    DMA_TX->CCR |= DMA_CCR_DIR;
-
-    /* Enable channel */
-    DMA_TX->CCR |= DMA_CCR_EN;
 }
 
