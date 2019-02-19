@@ -6,8 +6,8 @@
  */
 #include<stm32f0xx.h>
 #include<config.h>
-#include<spi.h> /* setup_spi */
-
+#include<spi.h>
+#include<sd.h>
 
 void init_sys(void) {
     /* init_leds(); */
