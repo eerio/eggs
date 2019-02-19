@@ -12,9 +12,6 @@
 #define LED_OFF() (LED_PORT->BRR |= (1 << LED_PIN))
 #define LED_TOGGLE() (LED_PORT->ODR ^= (1 << LED_PIN))
 
-uint8_t SPI_RX_buffer[32] = {0};
-uint8_t SPI_TX_buffer[32] = {9, 8, 7, 6, 5};
-
 /* TODO: Make it timer- and interruption-based, so it's accurate,
  *          [time-in-seconds-or-minutes-or-sth]-programmable and
  *          another interrupts occuring will not affect it
