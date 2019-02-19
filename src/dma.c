@@ -2,6 +2,11 @@
 #include<common.h>
 #include<dma.h>
 
+void configure_DMA(void) {
+    setup_DMA_RX();
+    setup_DMA_TX();
+}
+
 /* Transfer data from SPI1 RX FIFO to SPI RX buffer in memory */
 void setup_DMA_RX(void) {
     // TODO: jaki kurwa ma sens ustawianie aliasu jak uzywam dma1 tu i tak
@@ -12,12 +17,8 @@ void setup_DMA_RX(void) {
     if ((DMA_RX->CCR & DMA_CCR_EN) == 0) {
         DMA_RX->CPAR = (uint32_t)(&(SPI1->DR));
         DMA_RX->CMAR = (uint32_t)(&SPI_RX_buffer);
-        DMA_RX->CNDTR |= (32U << DMA_CNDTR_NDT_Pos);
+        DMA_RX->CNDTR |= (1U << DMA_CNDTR_NDT_Pos);
     }
-
-    /* Mapping: 0011 for this channel */
-    DMA_RX_DMA->CSELR &= ~(0xF << ((DMA_RX_Channel - 1) * 4));
-    DMA_RX_DMA->CSELR |= (0b0011 << ((DMA_RX_Channel - 1) * 4));
 
     /* Peripheral to memory mode */
     DMA_RX->CCR &= ~DMA_CCR_MEM2MEM;
@@ -32,7 +33,7 @@ void setup_DMA_RX(void) {
     /* Don't increment peripheral address */
     DMA_RX->CCR &= ~DMA_CCR_PINC;
     /* Circular mode */
-    DMA_RX->CCR |= DMA_CCR_CIRC;
+    DMA_RX->CCR &= ~DMA_CCR_CIRC;
     /* Transfer direction: Peripheral to memory*/
     DMA_RX->CCR &= ~DMA_CCR_DIR;
 
@@ -48,13 +49,9 @@ void setup_DMA_TX(void) {
     if ((DMA_TX->CCR & DMA_CCR_EN) == 0) {
         DMA_TX->CPAR = (uint32_t)(&(SPI1->DR));
         DMA_TX->CMAR = (uint32_t)(&SPI_TX_buffer);
-        DMA_TX->CNDTR |= (8U << DMA_CNDTR_NDT_Pos);
+        DMA_TX->CNDTR |= (1U << DMA_CNDTR_NDT_Pos);
     }
 
-    /* Mapping: 0011 for this channel */
-    DMA_TX_DMA->CSELR &= ~(0xF << ((DMA_TX_Channel - 1) * 4));
-    DMA_TX_DMA->CSELR |= (0b0011 << ((DMA_TX_Channel - 1) * 4));
-    
     /* Memory to peripheral mode */
     DMA_TX->CCR &= ~DMA_CCR_MEM2MEM;
     /* Channel priority: Very high */
