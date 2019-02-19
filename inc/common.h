@@ -5,6 +5,8 @@
  */
 #include<stm32f0xx.h>
 
+extern uint8_t SPI_RX_buffer[], SPI_TX_buffer[];
+
 /* Simplest delay routine possible, it counts down n times */
 void delay(unsigned int);
 

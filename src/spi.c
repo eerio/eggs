@@ -7,14 +7,6 @@
 #include<spi.h>
 #include<common.h>
 
-/* Send a sequence of bytes via SPI */
-void SPI_send(unsigned int n, uint8_t data[]) {
-    for (unsigned int i=0; i < n; ++i) {
-        while ((SPI1->SR & SPI_SR_TXE) == 0) {}
-        SPI1->DR = data[i] << 8;
-    }
-}
-
 /* Mode: full-duplex, master
  * Pins (all in AF0 mode):
  *  - PA4: NSS (Slave Select)
