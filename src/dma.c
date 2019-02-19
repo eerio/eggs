@@ -1,4 +1,6 @@
 #include<stm32f0xx.h>
+#include<common.h>
+#include<dma.h>
 
 /* Transfer data from SPI1 RX FIFO to SPI RX buffer in memory */
 void setup_DMA_RX(void) {
