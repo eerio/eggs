@@ -5,9 +5,6 @@
  */
 #include<stm32f0xx.h>
 
-/* Send a sequence of bytes by the SPI interface */
-void SPI_send(unsigned int, uint8_t []);
-
 /* Initialize SPI peripheral */
 void setup_spi(void);
 
