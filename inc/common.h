@@ -7,6 +7,8 @@
 
 extern uint8_t SPI_RX_buffer[], SPI_TX_buffer[];
 
+void SPI_send(unsigned int, uint8_t[]);
+
 /* Simplest delay routine possible, it counts down n times */
 void delay(unsigned int);
 

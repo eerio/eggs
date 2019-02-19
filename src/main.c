@@ -24,11 +24,9 @@ int main(void) {
 
     uint8_t msg[] = "Hello!\n";
     for(int i=0; i < 8; ++i) {
-        //SPI_TX_buffer[i] = msg[i];
-        SPI1->DR = msg[i];
-        delay(100);
-    }    
-
+        SPI_send(1, &msg[i]);
+    }
+    
     /* Disable SPI */
     SPI1->CR1 &= ~SPI_CR1_SPE;
 
