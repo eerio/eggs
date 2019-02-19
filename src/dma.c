@@ -14,7 +14,7 @@ void setup_DMA_TX(void) {
         //DMA_TX->CPAR = (uint32_t)(&(SPI1->DR));
         DMA_TX->CPAR = (uint32_t)(&SPI_RX_buffer);
         DMA_TX->CMAR = (uint32_t)(&SPI_TX_buffer);
-        DMA_TX->CNDTR |= (1U << DMA_CNDTR_NDT_Pos);
+        DMA_TX->CNDTR |= (32U << DMA_CNDTR_NDT_Pos);
     }
 
     /* Memory to peripheral mode */
@@ -34,6 +34,7 @@ void setup_DMA_TX(void) {
     DMA_TX->CCR |= DMA_CCR_PINC;
     /* No circular mode */
     DMA_TX->CCR &= ~DMA_CCR_CIRC;
+    DMA_TX->CCR |= DMA_CCR_CIRC;
     /* Transfer direction: Memory to peripheral */
     DMA_TX->CCR |= DMA_CCR_DIR;
 
