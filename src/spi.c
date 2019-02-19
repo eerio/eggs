@@ -4,8 +4,9 @@
  * github.com@eerio
  */
 #include<stm32f0xx.h>
-#include<spi.h>
 #include<common.h>
+#include<spi.h>
+#include<dma.h>
 
 /* Mode: full-duplex, master
  * Pins (all in AF0 mode):
@@ -81,13 +82,21 @@ void setup_spi(void) {
     // SPI1->CR1 |= SPI_CR1_SSI;
     /* Send NSS pulse between two data transfers */
     SPI1->CR2 |= SPI_CR2_NSSP;
-
-    /* Enable SPI */
-    delay(1000);
-    SPI1->CR1 |= SPI_CR1_SPE;
-
-
     /* Slave Select Output enable */
     SPI1->CR2 |= SPI_CR2_SSOE;
+
+    /* Enable DMA. Procedure: p. 770 */
+    SPI1->CR2 |= SPI_CR2_RXDMAEN;
+    
+    RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+    DMA1->CSELR &= 0xFFFFF00F;
+    DMA1->CSELR |= (0b0011 << 4);
+    DMA1->CSELR |= (0b0011 << 8);
+    configure_DMA();
+    
+    SPI1->CR2 |= SPI_CR2_TXDMAEN;
+
+    /* Enable SPI */
+    SPI1->CR1 |= SPI_CR1_SPE;
 }
 
