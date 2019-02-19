@@ -24,9 +24,9 @@ int main(void) {
 
     uint8_t msg[] = "Hello!\n";
     for(int i=0; i < 8+2 /* ? */; ++i) {
-        //SPI_TX_buffer[i] = msg[i];
-        while((SPI1->SR & SPI_SR_TXE) == 0) {}
-        SPI1->DR = msg[i];
+        SPI_TX_buffer[i] = msg[i];
+        //while((SPI1->SR & SPI_SR_TXE) == 0) {}
+        //SPI1->DR = msg[i];
     }    
 
     /* Disable SPI */

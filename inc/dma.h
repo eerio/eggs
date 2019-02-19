@@ -5,3 +5,6 @@
 #define DMA_TX_DMA (DMA1)
 #define DMA_TX_Channel (3)
 
+void configure_DMA(void);
+void setup_DMA_RX(void);
+void setup_DMA_TX(void);
