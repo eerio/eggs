@@ -87,21 +87,32 @@ void setup_spi(void) {
 
     /* Enable DMA. Procedure: p. 770 */
     SPI1->CR2 |= SPI_CR2_RXDMAEN;
-    
     RCC->AHBENR |= RCC_AHBENR_DMA1EN;
     DMA1->CSELR &= 0xFFFFF00F;
     DMA1->CSELR |= (0b0011 << 4);
     DMA1->CSELR |= (0b0011 << 8);
-    configure_DMA();
-    
+    configure_DMA(); 
     SPI1->CR2 |= SPI_CR2_TXDMAEN;
 
     /* Enable SPI */
     SPI1->CR1 |= SPI_CR1_SPE;
 
-    /* Wait 74 cycles for SD card to catch up */
-    delay(1000);
     /* Start DMA */
     start_DMA();
+}
+
+
+/* procedure: p. 768 */
+void disable_spi(void) {
+    /* Wait until FTLVL[1:] == 0 (no more data to transmit) */
+    while (SPI1->SR & SPI_SR_FTLVL) {}
+    /* Wait until BSY = 0 (the last data frame is processed) */
+    while (SPI1->SR & SPI_SR_BSY) {}
+    /* Disable SPI */
+    SPI1->CR1 &= ~SPI_CR1_SPE;
+
+    /* Read data until FRLVL[1:0] == 00 (read all the received data) */
+    while(SPI1->SR & SPI_SR_FRLVL) {}
+    disable_dma();
 }
 

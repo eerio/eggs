@@ -8,3 +8,6 @@
 /* Initialize SPI peripheral */
 void setup_spi(void);
 
+/* Disable SPI */
+void disable_spi(void);
+
