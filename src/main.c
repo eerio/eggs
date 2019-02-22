@@ -21,12 +21,14 @@ void OS_setup(void);
 int main(void) {
     /* Configure board's peripherals */
 
-    uint8_t msg[] = "Hello!\n";
+    uint8_t msg[] = {0b01000000, 0, 0, 0, 0, 0b10010101};
+
     for(int i=0; i < 8+2 /* ? */; ++i) {
         SPI_TX_buffer[i] = msg[i];
         //while((SPI1->SR & SPI_SR_TXE) == 0) {}
         //SPI1->DR = msg[i];
     }    
+    
     init_sys();
     delay(10000);
 
