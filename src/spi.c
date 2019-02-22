@@ -98,5 +98,10 @@ void setup_spi(void) {
 
     /* Enable SPI */
     SPI1->CR1 |= SPI_CR1_SPE;
+
+    /* Wait 74 cycles for SD card to catch up */
+    delay(1000);
+    /* Start DMA */
+    start_DMA();
 }
 
