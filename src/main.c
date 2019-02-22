@@ -19,21 +19,21 @@ void OS_setup(void);
 
 
 int main(void) {
-    /* Configure board's peripherals */
+    /* At this point we assume that the stack is initialized,
+     * .data segment is copied to SRAM, .bss segment is zero-filled,
+     * SystemCoreClock variable is set to current system clock source,
+     * internal clocks are initialized and __libc_init_array routine has
+     * been called. These things are done by ResetHandler in
+     * startup_<device>.s file and SystemInit func in system_<device_fam>.c
+     */
 
     uint8_t msg[] = {0b01000000, 0, 0, 0, 0, 0b10010101};
 
     for(int i=0; i < 8+2 /* ? */; ++i) {
         SPI_TX_buffer[i] = msg[i];
-        //while((SPI1->SR & SPI_SR_TXE) == 0) {}
-        //SPI1->DR = msg[i];
     }    
     
-    init_sys();
-    delay(10000);
-
-    /* Disable SPI */
-    SPI1->CR1 &= ~SPI_CR1_SPE;
+    disable_spi();
 
     /* Main thread after return from the main function goes to an infinite
      * loop in the startup_stm32f091xc.s file */
