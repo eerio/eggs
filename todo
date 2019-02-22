@@ -1,0 +1,2 @@
+Remove stdlib.h and string.h dependencies - executable size too big
+
