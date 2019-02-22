@@ -20,7 +20,6 @@ void OS_setup(void);
 
 int main(void) {
     /* Configure board's peripherals */
-    init_sys();
 
     uint8_t msg[] = "Hello!\n";
     for(int i=0; i < 8+2 /* ? */; ++i) {
@@ -28,6 +27,8 @@ int main(void) {
         //while((SPI1->SR & SPI_SR_TXE) == 0) {}
         //SPI1->DR = msg[i];
     }    
+    init_sys();
+    delay(10000);
 
     /* Disable SPI */
     SPI1->CR1 &= ~SPI_CR1_SPE;
