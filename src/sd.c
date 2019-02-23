@@ -11,7 +11,7 @@
 
 
 uint8_t blank[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-uint8_t cmd0[] = {0b01000000, 0, 0, 0, 0, 0b10010101};
+uint8_t cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
 
 
 void init_sd(void) {
@@ -26,13 +26,18 @@ void init_sd(void) {
     SD_GPIO->MODER &= ~GPIO_MODER_MODER4;
     SD_GPIO->MODER |= GPIO_MODER_MODER4_0;
 
-    /* Set NSS high and set MOSI high for 80 cycles (at least 74) */
+    /* Set NSS high and set MOSI high for 96 cycles (at least 74) */
     SD_GPIO->ODR |= (1 << 4);
-    for (unsigned int i=0; i < 10; ++i) spi_send(blank);
+    spi_send(blank);
+    spi_send(blank);
 
-    /* Set NSS low and send CMD0 */
+    /* Assert NSS and send CMD0 */
     SD_GPIO->ODR &= ~(1 << 4);
-    spi_send(cmd0);
+    while(1) spi_send(cmd0);
+    SD_GPIO->ODR |= (1 << 4);
+
+    /* Keep the clock for a while */
+    for (unsigned int i=0; i < 4; ++i) spi_send(blank);
 
     /* Revert settings */
     SD_SPI->CR1 = cr1;
