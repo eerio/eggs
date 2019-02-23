@@ -33,7 +33,6 @@ void init_sd(void) {
     /* Set NSS low and send CMD0 */
     SD_GPIO->ODR &= ~(1 << 4);
     spi_send(cmd0);
-    spi_send(cmd0);
 
     /* Revert settings */
     SD_SPI->CR1 = cr1;
