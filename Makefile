@@ -9,7 +9,7 @@ OOCD_SCR = /usr/share/openocd/scripts
 
 INCLUDES = -I$(INC) -I$(INC)/CMSIS
 COMMON_FLAGS = -mcpu=cortex-m0 -mthumb -mlittle-endian -DSTM32F091xC
-COMP_FLAGS = $(COMMON_FLAGS) -std=c99 -g3 -O0 -Wall -Wextra $(INCLUDES) -c
+COMP_FLAGS = $(COMMON_FLAGS) -std=c99 -g3 -Os -Wall -Wextra $(INCLUDES) -c
 LINK_FLAGS = $(COMMON_FLAGS) -T$(LINKER) -Wl,--gc-sections --specs=nosys.specs
 
 SRCS = $(wildcard $(SRC)/*.c)
@@ -24,7 +24,7 @@ PendSV_OBJ = $(DEST)/PendSV_Handler.o
 
 $(DEST)/main.hex: $(DEST)/main.elf
 	arm-none-eabi-objcopy -Oihex $< $@
-	#arm-none-eabi-strip --strip-debug --strip-unneeded $@ -o $@
+	arm-none-eabi-strip --strip-debug --strip-unneeded $@ -o $@
 
 $(DEST)/main.dbg: $(DEST)/main.elf
 	arm-none-eabi-objcopy --only-keep-debug $< $@
