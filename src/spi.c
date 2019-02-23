@@ -74,7 +74,7 @@ void setup_spi(void) {
     /* Disable CRC */
     SPI1->CR1 &= ~SPI_CR1_CRCEN;
     /* RXNE if the FIFO level >= 8 bit */
-    SPI1->CR2 |= SPI_CR2_FRXTH;
+    // SPI1->CR2 |= SPI_CR2_FRXTH;
     
     /* Hardware slave management */
     SPI1->CR1 &= ~SPI_CR1_SSM;
