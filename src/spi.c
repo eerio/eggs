@@ -20,7 +20,7 @@
  *  - 8 bits per transfer
  *  - clock is low when inactive (CPOL = 0)
  *  - data is valid on clock leading edge (CPHA = 0)
- *  - hardware NSS line management
+ *  - software NSS line management with NSSP enabled
  */
 void setup_spi(void) {
     /* Enable GPIO port A */
@@ -76,10 +76,8 @@ void setup_spi(void) {
     /* RXNE if the FIFO level >= 8 bit */
     SPI1->CR2 |= SPI_CR2_FRXTH;
     
-    /* Hardware slave management */
-    SPI1->CR1 &= ~SPI_CR1_SSM;
-    /* Internal slave select (redundant with SSM bit reset) */
-    // SPI1->CR1 |= SPI_CR1_SSI;
+    /* Software slave management */
+    SPI1->CR1 |= SPI_CR1_SSM;
     /* Send NSS pulse between two data transfers */
     SPI1->CR2 |= SPI_CR2_NSSP;
     /* Slave Select Output enable */
