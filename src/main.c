@@ -14,6 +14,7 @@
 #include<os.h>
 #include<common.h>
 #include<spi.h>
+#include<sd.h>
 
 void OS_setup(void);
 
@@ -26,12 +27,8 @@ int main(void) {
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
     init_sys();
-
-    uint8_t msg[] = {0b01000000, 0, 0, 0, 0, 0b10010101};
-    uint8_t blank[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-
-    spi_send(msg);
-    spi_send(blank);
+    init_sd();
+    
     disable_spi();
 
     /* Main thread after return from the main function goes to an infinite
