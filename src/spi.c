@@ -8,6 +8,14 @@
 #include<spi.h>
 #include<dma.h>
 
+void spi_send(uint8_t* x) {
+    for(unsigned int i=0; i < BUFFER_SIZE; ++i) {
+        SPI_TX_buffer[i] = x[i];
+    }
+    SPI1->CR2 |= SPI_CR2_TXDMAEN;
+    while (SPI1->CR2 & SPI_CR2_TXDMAEN) {}
+}
+
 /* Mode: full-duplex, master
  * Pins (all in AF0 mode):
  *  - PA4: NSS (Slave Select)

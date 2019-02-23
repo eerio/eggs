@@ -11,3 +11,4 @@ void setup_spi(void);
 /* Disable SPI */
 void disable_spi(void);
 
+void spi_send(uint8_t*);
