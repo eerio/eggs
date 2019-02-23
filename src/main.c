@@ -16,7 +16,7 @@
 #include<spi.h>
 
 void OS_setup(void);
-
+void spi_send(uint8_t*);
 
 int main(void) {
     /* At this point we assume that the stack is initialized,
@@ -26,20 +26,26 @@ int main(void) {
      * been called. These things are done by ResetHandler in
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
-
-    uint8_t msg[] = {0b01000000, 0, 0, 0, 0, 0b10010101};
-
-    for(int i=0; i < 6 /* ? */; ++i) {
-        SPI_TX_buffer[i] = msg[i];
-    }
-
     init_sys();
 
+    uint8_t msg[] = {0b01000000, 0, 0, 0, 0, 0b10010101};
+    uint8_t blank[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+    spi_send(msg);
+    spi_send(blank);
     disable_spi();
 
     /* Main thread after return from the main function goes to an infinite
      * loop in the startup_stm32f091xc.s file */
     return 0;
+}
+
+void spi_send(uint8_t* x) {
+    for(unsigned int i=0; i < BUFFER_SIZE; ++i) {
+        SPI_TX_buffer[i] = x[i];
+    }
+    SPI1->CR2 |= SPI_CR2_TXDMAEN;
+    while (SPI1->CR2 & SPI_CR2_TXDMAEN) {}
 }
 
 void OS_setup(void) {
