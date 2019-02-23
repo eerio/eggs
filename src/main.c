@@ -14,6 +14,7 @@
 #include<os.h>
 #include<common.h>
 #include<spi.h>
+#include<sd.h>
 
 void OS_setup(void);
 
