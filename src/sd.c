@@ -33,11 +33,11 @@ void init_sd(void) {
 
     /* Assert NSS and send CMD0 */
     SD_GPIO->ODR &= ~(1 << 4);
-    while(1) spi_send(cmd0);
-    SD_GPIO->ODR |= (1 << 4);
-
+    spi_send(cmd0);
     /* Keep the clock for a while */
     for (unsigned int i=0; i < 4; ++i) spi_send(blank);
+    
+    SD_GPIO->ODR |= (1 << 4);
 
     /* Revert settings */
     SD_SPI->CR1 = cr1;
