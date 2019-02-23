@@ -20,7 +20,7 @@ uint8_t SPI_TX_buffer[BUFFER_SIZE] = {0};
  *          another interrupts occuring will not affect it
  * TODO: It should be NOP()-based
  */
-void delay (unsigned int time) {
+void delay (volatile unsigned int time) {
     while (time > 0) {--time;}
 }
 
