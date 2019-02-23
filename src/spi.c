@@ -102,8 +102,11 @@ void setup_spi(void) {
 }
 
 
-/* procedure: p. 768 */
+/* procedure: p. 768, 770 */
 void disable_spi(void) {
+    /* Disable dma */
+    disable_dma();
+    
     /* Wait until FTLVL[1:] == 0 (no more data to transmit) */
     while (SPI1->SR & SPI_SR_FTLVL) {}
     /* Wait until BSY = 0 (the last data frame is processed) */
@@ -113,6 +116,8 @@ void disable_spi(void) {
 
     /* Read data until FRLVL[1:0] == 00 (read all the received data) */
     while(SPI1->SR & SPI_SR_FRLVL) {}
-    disable_dma();
+
+    /* Disable DMA TX and RX buffers in SPI */
+    SPI1->CR2 &= ~(SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN);
 }
 
