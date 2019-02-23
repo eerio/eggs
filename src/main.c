@@ -29,10 +29,12 @@ int main(void) {
 
     uint8_t msg[] = {0b01000000, 0, 0, 0, 0, 0b10010101};
 
-    for(int i=0; i < 8+2 /* ? */; ++i) {
+    for(int i=0; i < 6 /* ? */; ++i) {
         SPI_TX_buffer[i] = msg[i];
-    }    
-    
+    }
+
+    init_sys();
+
     disable_spi();
 
     /* Main thread after return from the main function goes to an infinite
