@@ -42,9 +42,9 @@ void configure_DMA(void) {
     /* Don't increment peripheral address */
     DMA_TX->CCR &= ~DMA_CCR_PINC;
     DMA_RX->CCR &= ~DMA_CCR_PINC;
-    /* Circular mode */
-    DMA_TX->CCR |= DMA_CCR_CIRC;
-    DMA_RX->CCR |= DMA_CCR_CIRC;
+    /* No circular mode */
+    DMA_TX->CCR &= ~DMA_CCR_CIRC;
+    DMA_RX->CCR &= ~DMA_CCR_CIRC;
     /* Transfer direction: Memory to peripheral */
     DMA_TX->CCR |= DMA_CCR_DIR;
     DMA_RX->CCR &= ~DMA_CCR_DIR; /* Periph to mem */
