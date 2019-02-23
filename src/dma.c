@@ -58,7 +58,9 @@ void start_DMA(void) {
 
 void disable_dma(void) {
     /* Disable channels */
+    while(DMA_TX->CNDTR) {}
     DMA_TX->CCR &= ~DMA_CCR_EN;
+    while(DMA_RX->CNDTR) {}
     DMA_RX->CCR &= ~DMA_CCR_EN;
 }
 
