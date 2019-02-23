@@ -43,11 +43,24 @@ void configure_DMA(void) {
     DMA_TX->CCR &= ~DMA_CCR_PINC;
     DMA_RX->CCR &= ~DMA_CCR_PINC;
     /* No circular mode */
-    DMA_TX->CCR &= ~DMA_CCR_CIRC;
-    DMA_RX->CCR &= ~DMA_CCR_CIRC;
+    // DMA_TX->CCR &= ~DMA_CCR_CIRC;
+    // DMA_RX->CCR &= ~DMA_CCR_CIRC;
+    /* Circular mode */
+    DMA_TX->CCR |= DMA_CCR_CIRC;
+    DMA_RX->CCR |= DMA_CCR_CIRC;
     /* Transfer direction: Memory to peripheral */
     DMA_TX->CCR |= DMA_CCR_DIR;
     DMA_RX->CCR &= ~DMA_CCR_DIR; /* Periph to mem */
+
+    /* Transfer complete interrupt enable */
+    DMA_TX->CCR |= DMA_CCR_TCIE;
+    NVIC_EnableIRQ(DMA1_Ch2_3_DMA2_Ch1_2_IRQn);
+    NVIC_SetPriority(DMA1_Ch2_3_DMA2_Ch1_2_IRQn, 0);
+}
+
+void DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler(void) {
+    SPI1->CR2 &= ~SPI_CR2_TXDMAEN;
+    DMA1->IFCR |= DMA_IFCR_CTCIF3;
 }
 
 void start_DMA(void) {
@@ -58,9 +71,8 @@ void start_DMA(void) {
 
 void disable_dma(void) {
     /* Disable channels */
-    while(DMA_TX->CNDTR) {}
+    while(DMA_TX->CNDTR != 6) {}
     DMA_TX->CCR &= ~DMA_CCR_EN;
-    while(DMA_RX->CNDTR) {}
     DMA_RX->CCR &= ~DMA_CCR_EN;
 }
 
