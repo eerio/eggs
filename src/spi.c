@@ -102,6 +102,7 @@ void setup_spi(void) {
     // SPI1->CR2 |= SPI_CR2_TXDMAEN;
 
     /* Enable SPI */
+    /* At this point MOSI line and clock are being pulled down */
     SPI1->CR1 |= SPI_CR1_SPE;
 
     /* Start DMA */
