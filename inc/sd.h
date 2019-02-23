@@ -3,4 +3,4 @@
  * author: Paweł Balawender
  * github.com@eerio
  */
-
+void init_sd(void);
