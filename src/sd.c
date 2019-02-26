@@ -12,6 +12,8 @@
 
 uint8_t blank[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 uint8_t cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
+uint8_t cmd8[] = {0b01001000, 0x00, 0x00, 0x01, 0b10101010, 0b00001111};
+uint8_t cmd58[] = {0b01111010, 0, 0, 0, 0, 0b01110101};
 
 
 void init_sd(void) {
@@ -34,6 +36,12 @@ void init_sd(void) {
     /* Assert NSS and send CMD0 */
     SD_GPIO->ODR &= ~(1 << 4);
     spi_send(cmd0);
+    /* TODO: Is it really needed? */
+    spi_send(blank);
+    spi_send(blank);
+    spi_send(blank);
+    /* CMD8 not supported */
+    spi_send(cmd58);
     /* Keep the clock for a while */
     for (unsigned int i=0; i < 4; ++i) spi_send(blank);
     
