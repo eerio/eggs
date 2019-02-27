@@ -6,9 +6,10 @@
 #include<stm32f0xx.h>
 
 /* 6 bytes SPI buffer */
-#define BUFFER_SIZE (6U)
+#define TX_BUFFER_SIZE (6U)
+#define RX_BUFFER_SIZE (1024U)
 
-extern uint8_t SPI_RX_buffer[], SPI_TX_buffer[];
+extern uint8_t SPI_RX_buffer[RX_BUFFER_SIZE], SPI_TX_buffer[TX_BUFFER_SIZE];
 
 /* Simplest delay routine possible, it counts down n times */
 void delay(unsigned int);
