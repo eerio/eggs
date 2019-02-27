@@ -15,13 +15,13 @@ void configure_DMA(void) {
     if ((DMA_TX->CCR & DMA_CCR_EN) == 0) {
         DMA_TX->CPAR = (uint32_t)(&(SPI1->DR));
         DMA_TX->CMAR = (uint32_t)(&SPI_TX_buffer);
-        DMA_TX->CNDTR |= (BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
+        DMA_TX->CNDTR |= (TX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
     }
     /* Perform each time 1 transfer from SPI1 RX FIFO to the buffer */
     if ((DMA_RX->CCR & DMA_CCR_EN) == 0) {
         DMA_RX->CPAR = (uint32_t)(&(SPI1->DR));
         DMA_RX->CMAR = (uint32_t)(&SPI_RX_buffer);
-        DMA_RX->CNDTR |= (1U << DMA_CNDTR_NDT_Pos);
+        DMA_RX->CNDTR |= (RX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
     }
 
     /* Memory to peripheral mode */
