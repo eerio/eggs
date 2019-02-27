@@ -9,12 +9,15 @@
 #include<dma.h>
 
 void spi_send(uint8_t* x) {
-    for(unsigned int i=0; i < BUFFER_SIZE; ++i) {
+    SPI1->CR2 |= SPI_CR2_RXDMAEN;
+    for(unsigned int i=0; i < TX_BUFFER_SIZE; ++i) {
         SPI_TX_buffer[i] = x[i];
     }
     SPI1->CR2 |= SPI_CR2_TXDMAEN;
     while (SPI1->CR2 & SPI_CR2_TXDMAEN) {}
     while (SPI1->SR & SPI_SR_BSY) {}
+
+    //while (SPI1->CR2 & SPI_CR2_RXDMAEN) {}
 }
 
 /* Mode: full-duplex, master
@@ -93,7 +96,7 @@ void setup_spi(void) {
     SPI1->CR2 |= SPI_CR2_SSOE;
 
     /* Enable DMA. Procedure: p. 770 */
-    SPI1->CR2 |= SPI_CR2_RXDMAEN;
+    // SPI1->CR2 |= SPI_CR2_RXDMAEN;
     RCC->AHBENR |= RCC_AHBENR_DMA1EN;
     DMA1->CSELR &= 0xFFFFF00F;
     DMA1->CSELR |= (0b0011 << 4);
