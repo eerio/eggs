@@ -49,8 +49,8 @@ void init_sd(void) {
     /* Read SD card's OCR register and give clock for at least 6+1 bytes */
     spi_send(cmd58);
     spi_send(blank);
-    spi_send(blank)
-    resp = spi_read();
+    spi_send(blank);
+    resp = spi_read() - 6;
 
     /* Assert no errors in R1 */
     if (resp[0] != 0x01) while (1) {
@@ -78,7 +78,8 @@ void init_sd(void) {
     do {
         spi_send(cmd58);
         spi_send(blank);
-        resp = spi_read();
+        spi_send(blank);
+        resp = spi_read() - 6;
     } while ((resp[1] & (1 << 7))== 0);
 
     /* Revert settings */
