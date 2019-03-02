@@ -16,8 +16,12 @@ void spi_send(uint8_t* x) {
     SPI1->CR2 |= SPI_CR2_TXDMAEN;
     while (SPI1->CR2 & SPI_CR2_TXDMAEN) {}
     while (SPI1->SR & SPI_SR_BSY) {}
+    
+    SPI_RX_ind += TX_BUFFER_SIZE;
+}
 
-    //while (SPI1->CR2 & SPI_CR2_RXDMAEN) {}
+uint8_t* spi_read(void) {
+    return &SPI_RX_buffer[SPI_RX_ind - 4 - 1];
 }
 
 /* Mode: full-duplex, master
