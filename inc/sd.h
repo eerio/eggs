@@ -3,4 +3,7 @@
  * author: Paweł Balawender
  * github.com@eerio
  */
-void init_sd(void);
+#include"diskio.h" /* STA_NOINIT, STA_NODISK */
+
+DSTATUS sd_initialize (void);
+
