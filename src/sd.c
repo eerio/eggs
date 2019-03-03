@@ -37,8 +37,10 @@ uint8_t cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
 uint8_t cmd8[] = {0b01001000, 0x00, 0x00, 0x01, 0xAA, 0b00001111};
 uint8_t cmd58[] = {0b01111010, 0, 0, 0, 0, 0b01110101};
 uint8_t cmd55[] = {0b01110111, 0, 0, 0, 0, 1};
-uint8_t acmd41[] = {0b01101001, 0, 0, 0, 0, 1};
+/* hcs = 1 to control sdhc */
+uint8_t acmd41[] = {0b01101001, 0x40, 0, 0, 0, 1};
 
+typedef uint8_t bool;
 typedef uint8_t uint4_t;
 typedef uint8_t ResponseR1;
 
