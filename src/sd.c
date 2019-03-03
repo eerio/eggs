@@ -34,7 +34,7 @@ uint8_t blank[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 uint8_t cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
 /* resp: r7, arg: bits [11:8] of cmd: supply voltage, [7:0]: check pattern
  p.237*/
-uint8_t cmd8[] = {0b01001000, 0x00, 0x00, 0x01, 0xAA, 0b00001111};
+uint8_t cmd8[] = {0b01001000, 0x00, 0x00, 0x01, 0xAA, 0x87};
 uint8_t cmd58[] = {0b01111010, 0, 0, 0, 0, 0b01110101};
 uint8_t cmd55[] = {0b01110111, 0, 0, 0, 0, 1};
 /* hcs = 1 to control sdhc */
@@ -84,21 +84,20 @@ void init_sd(void) {
     spi_send(blank);
     resp = spi_read();
 
-    if (*resp & (1 << 2)) {
+    if (*resp & R1_ILLEGAL_COMMAND) {
         /* Illegal command -> Ver 1.X SD card or not a SD card */
         spi_send(cmd58);
         spi_send(blank);
         resp = spi_read();
         if ((*(resp + 3) & 0xF) != 0b0001) while (1) { /* Voltage wrong */}
-        if (*resp & (1 << 2)) {
-            /* Illegal command again -> Not SD card */
+        if (*resp & R1_ILLEGAL_COMMAND) {
             while (1) { /* Not a SD Memory card */ }
         }
     } else {
         /* No Illegal command in reponce -> Ver >= 2.0 SD card
          * Check if CRC error or non-compatible voltage range
          */
-        if (*resp & (1 << 3)) while (1) { /* Card unusable */ }
+        if (*resp & R1_COM_CRC_ERROR) while (1) { /* Card unusable */ }
         if ((*(resp + 3) & 0xF) != 0b0001) while (1) { /* Voltage wrong */}
     }
 
