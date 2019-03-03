@@ -57,10 +57,10 @@ void setup_spi(void) {
     GPIOA->OTYPER &= 0xFFFFFF0F;
     /* Select pull-up resistors for NSS, SCK, MISO, MOSI */
     GPIOA->PUPDR &= 0xFFFF00FF;
-    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR4_0;
+    /*GPIOA->PUPDR |= GPIO_PUPDR_PUPDR4_0;
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR5_0;
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR6_0;
-    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;
+    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;*/
     /* Select highest frequency*/
     GPIOA->OSPEEDR |= 0x0000FF00;
 
