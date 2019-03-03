@@ -135,6 +135,9 @@ void disable_spi(void) {
     /* Disable SPI */
     SPI1->CR1 &= ~SPI_CR1_SPE;
 
+    /* its a workaround; without this, frlvl never drops to 0 */
+    SPI1->DR;
+
     /* Read data until FRLVL[1:0] == 00 (read all the received data) */
     while(SPI1->SR & SPI_SR_FRLVL) {}
 
