@@ -26,18 +26,18 @@ void init_sd(void) {
     volatile uint8_t *resp;
 
     /* Change NSS management to software */
-    SD_SPI->CR1 |= SPI_CR1_SSM;
+    //SD_SPI->CR1 |= SPI_CR1_SSM;
     /* Select output mode for NSS pin */
-    SD_GPIO->MODER &= ~GPIO_MODER_MODER4;
-    SD_GPIO->MODER |= GPIO_MODER_MODER4_0;
+    //SD_GPIO->MODER &= ~GPIO_MODER_MODER4;
+    //SD_GPIO->MODER |= GPIO_MODER_MODER4_0;
 
     /* Set NSS high and set MOSI high for 96 cycles (at least 74) */
-    SD_GPIO->ODR |= (1 << 4);
+    //SD_GPIO->ODR |= (1 << 4);
     spi_send(blank);
     spi_send(blank);
 
     /* Assert NSS to send commands */
-    SD_GPIO->ODR &= ~(1 << 4);
+    //SD_GPIO->ODR &= ~(1 << 4);
 
     /* Spam CMD0 */
     do {
@@ -83,7 +83,7 @@ void init_sd(void) {
     } while ((resp[1] & (1 << 7))== 0);
 
     /* Revert settings */
-    SD_GPIO->ODR |= (1 << 4);
+    //SD_GPIO->ODR |= (1 << 4);
     SD_SPI->CR1 = cr1;
     SD_SPI->CR2 = cr2;
     SD_GPIO->MODER = moder;
