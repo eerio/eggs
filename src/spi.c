@@ -55,14 +55,20 @@ void setup_spi(void) {
 
     /* Select push-pull mode */
     GPIOA->OTYPER &= 0xFFFFFF0F;
-    /* Select pull-up resistors for NSS, SCK, MISO, MOSI */
+    /* Select pull-up resistors for NSS, MISO, MOSI, down for SCK */
     GPIOA->PUPDR &= 0xFFFF00FF;
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR4_0;
-    /*GPIOA->PUPDR |= GPIO_PUPDR_PUPDR5_0;
+    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR5_1;
     GPIOA->PUPDR |= GPIO_PUPDR_PUPDR6_0;
-    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;*/
-    /* Select highest frequency*/
-    GPIOA->OSPEEDR |= 0x0000FF00;
+    GPIOA->PUPDR |= GPIO_PUPDR_PUPDR7_0;
+    /* Select lowest frequency*/
+    GPIOA->OSPEEDR &= 0xFFFFFF0F;
+    /* Lock every bit of GPIOA registers */
+    /* Write sequence on LCKKC */
+    GPIOA->LCKR = (uint32_t)(0xFFFF | (1 << 16));
+    GPIOA->LCKR = (uint32_t)(0xFFFF | (0 << 16));
+    GPIOA->LCKR = (uint32_t)(0xFFFF | (1 << 16));
+    while ((GPIOA->LCKR & GPIO_LCKR_LCKK) == 0) { /* GPIO conf. error */ }
 
 
     /* Data mode: 2-line unidirectional */
