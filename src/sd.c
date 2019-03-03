@@ -34,11 +34,11 @@ uint8_t blank[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 uint8_t cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
 /* resp: r7, arg: bits [11:8] of cmd: supply voltage, [7:0]: check pattern
  p.237*/
-uint8_t cmd8[] = {0b01001000, 0x00, 0x00, 0x01, 0xAA, 0x87};
-uint8_t cmd58[] = {0b01111010, 0, 0, 0, 0, 0b01110101};
-uint8_t cmd55[] = {0b01110111, 0, 0, 0, 0, 1};
+uint8_t cmd8[] = {0x48, 0x00, 0x00, 0x01, 0xAA, 0x87};
+uint8_t cmd58[] = {0x7A, 0, 0, 0, 0, 0x95};
+uint8_t cmd55[] = {0x77, 0, 0, 0, 0, 0x65};
 /* hcs = 1 to control sdhc */
-uint8_t acmd41[] = {0b01101001, 0x40, 0, 0, 0, 1};
+uint8_t acmd41[] = {0x69, 0x40, 0, 0, 0, 0x77};
 
 typedef uint8_t bool;
 typedef uint8_t uint4_t;
@@ -64,6 +64,13 @@ typedef struct {
     uint8_t check_pattern;
 } ResponseR7;
 
+void read_block(void);
+
+
+
+bool version_gt_2 = 1;
+bool standard_cap = 1;
+
 
 void init_sd(void) {
     volatile uint8_t *resp;
@@ -86,6 +93,8 @@ void init_sd(void) {
 
     if (*resp & R1_ILLEGAL_COMMAND) {
         /* Illegal command -> Ver 1.X SD card or not a SD card */
+        version_gt_2 = 0;
+
         spi_send(cmd58);
         spi_send(blank);
         resp = spi_read();
@@ -107,12 +116,17 @@ void init_sd(void) {
      *
      * ref: p.227 PhysicalLayerSimplifiedSpecification, p.7 lec12
      */
+
+    /* thats a workaround; it sends 0x05 as r1 withotu it */
+    spi_send(blank);
+
     do {
         spi_send(cmd55);
+        spi_send(blank);
         spi_send(acmd41);
         spi_send(blank);
         resp = spi_read();
-    } while ((*resp & 1) == 0);
+    } while (*resp != 1);
 
     /* Get CCS */
     spi_send(cmd58);
@@ -122,8 +136,19 @@ void init_sd(void) {
     /* ccs=0: ver 2.0 sd standard capacity, ccs=1: ver 2.0, sdhc/sdxc */
     if (*(resp + 1) & 0b01000000) {
         /* Version >= 2.00 SDHC / SDXC memory card */
+        standard_cap = 0;
     } else {
         /* Version >= 2.00 SD Standard Capacity card */
+        standard_cap = 1;
     }
+
+    read_block();
+}
+
+
+void read_block(void) {
+    uint8_t cmd17[] = {0b01010001, 0, 0, 0, 0, 1};
+    spi_send(cmd17);
+    for (int i=0; i < 10; ++i) spi_send(blank);
 }
 
