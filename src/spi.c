@@ -21,6 +21,7 @@ void spi_send(uint8_t* x) {
 }
 
 uint8_t* spi_read(void) {
+    if (SPI_RX_ind-5 > RX_BUFFER_SIZE) while(1) { /* Buffer overflow */ }
     return &SPI_RX_buffer[SPI_RX_ind - 4 - 1];
 }
 
