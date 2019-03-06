@@ -14,7 +14,7 @@
 
 uint8_t SPI_RX_buffer[RX_BUFFER_SIZE] = {0};
 uint8_t SPI_TX_buffer[TX_BUFFER_SIZE] = {0};
-uint8_t SPI_RX_ind = 0;
+uint32_t SPI_RX_ind = 0;
 
 /* TODO: Make it timer- and interruption-based, so it's accurate,
  *          [time-in-seconds-or-minutes-or-sth]-programmable and
