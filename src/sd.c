@@ -126,7 +126,7 @@ void init_sd(void) {
         spi_send(acmd41);
         spi_send(blank);
         resp = spi_read();
-    } while (*resp != 1);
+    } while (*resp);
 
     /* Get CCS */
     spi_send(cmd58);
