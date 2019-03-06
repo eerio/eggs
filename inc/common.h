@@ -10,7 +10,7 @@
 #define RX_BUFFER_SIZE (1024U)
 
 extern uint8_t SPI_RX_buffer[RX_BUFFER_SIZE], SPI_TX_buffer[TX_BUFFER_SIZE];
-extern uint8_t SPI_RX_ind;
+extern uint32_t SPI_RX_ind;
 
 /* Simplest delay routine possible, it counts down n times */
 void delay(unsigned int);
