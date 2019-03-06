@@ -6,4 +6,4 @@
 #include"diskio.h" /* STA_NOINIT, STA_NODISK */
 
 DSTATUS sd_initialize (void);
-
+void init_sd(void);
