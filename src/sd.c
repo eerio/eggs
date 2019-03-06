@@ -74,16 +74,19 @@ bool standard_cap = 1;
 
 void init_sd(void) {
     volatile uint8_t *resp;
+    unsigned int timeout;
 
     /* Toggle CLK for 96 cycles (at least 74) */
     spi_send(blank);
     spi_send(blank);
 
     /* Spam CMD0 until there's a response */
+    timeout = 32;
     do {
         spi_send(cmd0);
         spi_send(blank);
         resp = spi_read();
+        if (!timeout--) while(1) { /* Timeout; no SD card detected */ }
     } while (*resp == 0xFF);
 
     /* Send CMD8, check if Illegal Command in responce */
