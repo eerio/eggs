@@ -7,7 +7,7 @@
 
 /* 6 bytes SPI buffer */
 #define TX_BUFFER_SIZE (6U)
-#define RX_BUFFER_SIZE (1024U)
+#define RX_BUFFER_SIZE (2048U)
 
 extern uint8_t SPI_RX_buffer[RX_BUFFER_SIZE], SPI_TX_buffer[TX_BUFFER_SIZE];
 extern uint32_t SPI_RX_ind;
