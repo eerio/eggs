@@ -125,6 +125,7 @@ void init_sd(void) {
 
     do {
         spi_send(cmd55);
+        /* its also obedient; without it acmd41 has resp = illegal cmd */
         spi_send(blank);
         spi_send(acmd41);
         spi_send(blank);
