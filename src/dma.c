@@ -51,7 +51,7 @@ void configure_DMA(void) {
 
     /* Transfer complete interrupt enable */
     DMA_TX->CCR |= DMA_CCR_TCIE;
-    DMA_RX->CCR |= DMA_CCR_TCIE;
+    //DMA_RX->CCR |= DMA_CCR_TCIE;
     NVIC_EnableIRQ(DMA1_Ch2_3_DMA2_Ch1_2_IRQn);
     NVIC_SetPriority(DMA1_Ch2_3_DMA2_Ch1_2_IRQn, 0);
 }
@@ -60,10 +60,6 @@ void DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler(void) {
     if (DMA1->ISR & DMA_ISR_TCIF3) {
         SPI1->CR2 &= ~SPI_CR2_TXDMAEN;
         DMA1->IFCR |= DMA_IFCR_CTCIF3;
-    } else if (DMA1->ISR & DMA_ISR_TCIF2) {
-        while(1) { /* Overflow */ }
-        SPI1->CR2 &= ~SPI_CR2_RXDMAEN;
-        DMA1->IFCR |= DMA_IFCR_CTCIF2;
     }
 }
 
