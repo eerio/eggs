@@ -155,6 +155,7 @@ void init_sd(void) {
 
 void read_block(void) {
     spi_send(cmd17);
-    for (int i=0; i < 10; ++i) spi_send(blank);
+    /* Send 512 clock ticks; 512/6=85.(3) */
+    for (int i=0; i < 86; ++i) spi_send(blank);
 }
 
