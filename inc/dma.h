@@ -7,6 +7,7 @@
 #define DMA_SPI_TX_Channel (3U)
 
 #define USE_DEFAULT_SPI_SD_TX_DMA
+#define USE_DEFAULT_SPI_SD_RX_DMA
 
 void configure_DMA(void);
 void start_DMA(void);
