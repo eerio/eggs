@@ -3,19 +3,15 @@
 #include<dma.h>
 
 void configure_DMA(void) {
-    /* Perform each time 1 transfer from SPI TX buffer to SPI1->DR */
-    if ((DMA_SPI_TX->CCR & DMA_CCR_EN) == 0) {
-        DMA_SPI_TX->CPAR = (uint32_t)(&(SPI1->DR));
-        DMA_SPI_TX->CMAR = (uint32_t)(&SPI_TX_buffer);
-        DMA_SPI_TX->CNDTR |= (SPI_TX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
-    }
-    /* Perform each time 1 transfer from SPI1 RX FIFO to the buffer */
-    if ((DMA_SPI_RX->CCR & DMA_CCR_EN) == 0) {
-        DMA_SPI_RX->CPAR = (uint32_t)(&(SPI1->DR));
-        DMA_SPI_RX->CMAR = (uint32_t)(&SPI_RX_buffer);
-        DMA_SPI_RX->CNDTR |= (SPI_RX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
-    }
-
+    /* Peripheral: SD's SPI */
+    DMA_SPI_TX->CPAR = (uint32_t)(&(SPI_SD->DR));
+    DMA_SPI_RX->CPAR = (uint32_t)(&(SPI_SD->DR));
+    /* Memory address: buffers */
+    DMA_SPI_TX->CMAR = (uint32_t)(&SPI_TX_buffer);
+    DMA_SPI_RX->CMAR = (uint32_t)(&SPI_RX_buffer);
+    /* Not to cause a buffer overflow, set CNDTR to buffers' sizes */
+    DMA_SPI_TX->CNDTR |= (SPI_TX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
+    DMA_SPI_RX->CNDTR |= (SPI_RX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
     /* Memory to peripheral mode */
     DMA_SPI_TX->CCR &= ~DMA_CCR_MEM2MEM;
     DMA_SPI_RX->CCR &= ~DMA_CCR_MEM2MEM;
@@ -34,15 +30,12 @@ void configure_DMA(void) {
     /* Don't increment peripheral address */
     DMA_SPI_TX->CCR &= ~DMA_CCR_PINC;
     DMA_SPI_RX->CCR &= ~DMA_CCR_PINC;
-    /* No circular mode */
-    // DMA_SPI_TX->CCR &= ~DMA_CCR_CIRC;
-    // DMA_SPI_RX->CCR &= ~DMA_CCR_CIRC;
     /* Circular mode */
     DMA_SPI_TX->CCR |= DMA_CCR_CIRC;
     DMA_SPI_RX->CCR |= DMA_CCR_CIRC;
-    /* Transfer direction: Memory to peripheral */
-    DMA_SPI_TX->CCR |= DMA_CCR_DIR;
-    DMA_SPI_RX->CCR &= ~DMA_CCR_DIR; /* Periph to mem */
+    /* Transfer direction */
+    DMA_SPI_TX->CCR |= DMA_CCR_DIR; /* Memory to peripheral */
+    DMA_SPI_RX->CCR &= ~DMA_CCR_DIR; /* Peripheral to memory */
 
     /* Transfer complete interrupt enable */
     DMA_SPI_TX->CCR |= DMA_CCR_TCIE;
@@ -56,9 +49,9 @@ void start_DMA(void) {
     DMA_SPI_RX->CCR |= DMA_CCR_EN;
 }
 
-void disable_dma(void) {
+void disable_DMA(void) {
     /* Disable channels */
-    while(DMA_SPI_TX->CNDTR != 6) {}
+    while(DMA_SPI_TX->CNDTR != SPI_TX_BUFFER_SIZE) {}
     DMA_SPI_TX->CCR &= ~DMA_CCR_EN;
     DMA_SPI_RX->CCR &= ~DMA_CCR_EN;
 }
