@@ -127,7 +127,6 @@ void init_sd(void) {
 
     /* send it for at least 1 second; p.46 PhysicalLayerSimplifiedSpec */
     do {
-        for(int i=0; i < 16; i++) spi_send(blank);
         spi_send(cmd55);
         /* its also obedient; without it acmd41 has resp = illegal cmd */
         spi_send(blank);
