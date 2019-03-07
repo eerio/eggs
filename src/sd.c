@@ -39,6 +39,8 @@ uint8_t cmd58[] = {0x7A, 0, 0, 0, 0, 0x95};
 uint8_t cmd55[] = {0x77, 0, 0, 0, 0, 0x65};
 /* hcs = 1 to control sdhc */
 uint8_t acmd41[] = {0x69, 0x40, 0, 0, 0, 0x77};
+uint8_t cmd17[] = {0x51, 0, 0, 0, 0, 0xFF};
+
 
 typedef uint8_t bool;
 typedef uint8_t uint4_t;
@@ -153,7 +155,6 @@ void init_sd(void) {
 
 
 void read_block(void) {
-    uint8_t cmd17[] = {0b01010001, 0, 0, 0, 0, 1};
     spi_send(cmd17);
     for (int i=0; i < 10; ++i) spi_send(blank);
 }
