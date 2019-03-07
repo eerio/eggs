@@ -1,6 +1,7 @@
 #include<stm32f0xx.h>
-#include<common.h>
+#include<common.h> /* buffers */
 #include<dma.h>
+#include<spi.h> /* SPI_SD */
 
 void configure_DMA(void) {
     /* Peripheral: SD's SPI */

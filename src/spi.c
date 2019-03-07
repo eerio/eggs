@@ -128,7 +128,7 @@ void setup_spi(void) {
 /* procedure: p. 768, 770 */
 void disable_spi(void) {
     /* Disable dma */
-    disable_dma();
+    disable_DMA();
     
     /* Wait until FTLVL[1:] == 0 (no more data to transmit) */
     while (SPI_SD->SR & SPI_SR_FTLVL) {}
