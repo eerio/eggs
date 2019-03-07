@@ -4,7 +4,7 @@ Then compile it by:
 Then, in another terminal, go to root dir of this example and call:  
   >> openocd  
 Then, in this terminal, use:  
-  >> flash  
+  >> make flash  
 And, in the opened GDB console, type:  
   >> c  
 And that's all. You should see LEDs blinking with different frequency.  
