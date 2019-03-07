@@ -3,6 +3,7 @@
  * author: Pawel Balawender
  * https://github.com/eerio/eggs.git
  */
+#include<stm32f0xx.h>
 #include<common.h>
 
 /* Macros for the User LED, LD2, pin 5 @ GPIO port A */
