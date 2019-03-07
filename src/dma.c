@@ -3,17 +3,17 @@
 #include<dma.h>
 
 void configure_DMA(void) {
-    /* Perform each time 6 transfers from SPI TX buffer to SPI1->DR */
+    /* Perform each time 1 transfer from SPI TX buffer to SPI1->DR */
     if ((DMA_SPI_TX->CCR & DMA_CCR_EN) == 0) {
         DMA_SPI_TX->CPAR = (uint32_t)(&(SPI1->DR));
         DMA_SPI_TX->CMAR = (uint32_t)(&SPI_TX_buffer);
-        DMA_SPI_TX->CNDTR |= (TX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
+        DMA_SPI_TX->CNDTR |= (SPI_TX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
     }
     /* Perform each time 1 transfer from SPI1 RX FIFO to the buffer */
     if ((DMA_SPI_RX->CCR & DMA_CCR_EN) == 0) {
         DMA_SPI_RX->CPAR = (uint32_t)(&(SPI1->DR));
         DMA_SPI_RX->CMAR = (uint32_t)(&SPI_RX_buffer);
-        DMA_SPI_RX->CNDTR |= (RX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
+        DMA_SPI_RX->CNDTR |= (SPI_RX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
     }
 
     /* Memory to peripheral mode */
@@ -34,6 +34,9 @@ void configure_DMA(void) {
     /* Don't increment peripheral address */
     DMA_SPI_TX->CCR &= ~DMA_CCR_PINC;
     DMA_SPI_RX->CCR &= ~DMA_CCR_PINC;
+    /* No circular mode */
+    // DMA_SPI_TX->CCR &= ~DMA_CCR_CIRC;
+    // DMA_SPI_RX->CCR &= ~DMA_CCR_CIRC;
     /* Circular mode */
     DMA_SPI_TX->CCR |= DMA_CCR_CIRC;
     DMA_SPI_RX->CCR |= DMA_CCR_CIRC;
@@ -43,10 +46,15 @@ void configure_DMA(void) {
 
     /* Transfer complete interrupt enable */
     DMA_SPI_TX->CCR |= DMA_CCR_TCIE;
-    //DMA_SPI_RX->CCR |= DMA_CCR_TCIE;
     NVIC_EnableIRQ(DMA1_Ch2_3_DMA2_Ch1_2_IRQn);
     NVIC_SetPriority(DMA1_Ch2_3_DMA2_Ch1_2_IRQn, 0);
 }
+
+void DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler(void) {
+    SPI1->CR2 &= ~SPI_CR2_TXDMAEN;
+    DMA1->IFCR |= DMA_IFCR_CTCIF3;
+}
+
 void start_DMA(void) {
     /* Enable channels */
     DMA_SPI_TX->CCR |= DMA_CCR_EN;
