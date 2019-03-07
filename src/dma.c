@@ -50,11 +50,6 @@ void configure_DMA(void) {
     NVIC_SetPriority(DMA1_Ch2_3_DMA2_Ch1_2_IRQn, 0);
 }
 
-void DMA1_Ch2_3_DMA2_Ch1_2_IRQHandler(void) {
-    SPI1->CR2 &= ~SPI_CR2_TXDMAEN;
-    DMA1->IFCR |= DMA_IFCR_CTCIF3;
-}
-
 void start_DMA(void) {
     /* Enable channels */
     DMA_SPI_TX->CCR |= DMA_CCR_EN;
