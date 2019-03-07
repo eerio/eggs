@@ -1,7 +1,13 @@
+/* Implementations of DMA procedures to handle SPI peripheral to
+ * communicate with an external SD card
+ * 
+ * author: Paweł Balawender
+ * github.com@eerio
+ */
 #include<stm32f0xx.h>
-#include<common.h> /* buffers */
-#include<dma.h>
+#include<common.h> /* SD'S SPI TX/RX buffers and their addresses */
 #include<spi.h> /* SPI_SD */
+#include<dma.h>
 
 void configure_DMA(void) {
     /* Peripheral: SD's SPI */
@@ -56,8 +62,9 @@ void start_DMA(void) {
 }
 
 void disable_DMA(void) {
-    /* Disable channels */
+    /* Wait till transfer finished */
     while(DMA_SPI_TX->CNDTR != SPI_TX_BUFFER_SIZE) {}
+    /* Disable channels */
     DMA_SPI_TX->CCR &= ~DMA_CCR_EN;
     DMA_SPI_RX->CCR &= ~DMA_CCR_EN;
 }
