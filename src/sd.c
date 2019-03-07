@@ -6,6 +6,7 @@
 #include<sd.h>
 #include<spi.h>
 #include<common.h>
+#include<diskio.h>
 
 #define R1_PARAMETER_ERROR (1U << 6)
 #define R1_ADDRESS_ERROR (1U << 5)
@@ -74,7 +75,7 @@ bool version_gt_2 = 1;
 bool standard_cap = 1;
 
 
-void init_sd(void) {
+DSTATUS sd_initialize(void) {
     volatile uint8_t *resp;
     unsigned int timeout;
 
@@ -149,7 +150,7 @@ void init_sd(void) {
         standard_cap = 1;
     }
 
-    read_block();
+    return 0;
 }
 
 

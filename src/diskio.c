@@ -3,7 +3,7 @@
 /*-----------------------------------------------------------------------*/
 
 #include "diskio.h"
-
+#include <sd.h>
 
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
@@ -11,11 +11,7 @@
 
 DSTATUS disk_initialize (void)
 {
-	DSTATUS stat;
-
-	// Put your code here
-
-	return stat;
+	return sd_initialize();
 }
 
 
@@ -32,8 +28,6 @@ DRESULT disk_readp (
 )
 {
 	DRESULT res;
-
-	// Put your code here
 
 	return res;
 }

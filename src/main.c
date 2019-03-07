@@ -32,7 +32,6 @@ int main(void) {
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
     init_sys();
-    init_sd();
 
     FATFS fatfs;
     FRESULT rc = pf_mount(&fatfs);
