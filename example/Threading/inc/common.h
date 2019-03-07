@@ -1,9 +1,8 @@
 /* Collection of miscellaneous and commonly-used functions and macros
  *
- * author: Paweł Balawender
- * github.com@eerio
+ * author: Pawel Balawender
+ * https://github.com/eerio/eggs.git
  */
-#include<stm32f0xx.h>
 
 /* Simplest delay routine possible, it counts down n times */
 void delay(unsigned int);

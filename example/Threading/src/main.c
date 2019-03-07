@@ -7,8 +7,8 @@
  * your User LED (LD2, pin 5 @ GPIO port A) blinking
  * at periodically changing frequency
  *
- * author: Paweł Balawender, github.com/eerio
- *
+ * author: Paweł Balawender
+ * https://github.com/eerio/eggs.git
  */
 #include<config.h>
 #include<os.h>

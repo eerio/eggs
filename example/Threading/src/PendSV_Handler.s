@@ -1,3 +1,8 @@
+/* Context switch mechanism implementation for the Task Scheduler
+ *
+ * author: Pawel Balawender
+ * https://github.com/eerio/eggs.git
+ */
 .syntax unified
 .cpu cortex-m0
 .fpu softvfp

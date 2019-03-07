@@ -1,7 +1,7 @@
 /* Configuration procedures prototypes
  *
- * author: Paweł Balawender
- * github.com@eerio
+ * author: Pawel Balawender
+ * https://github.com/eerio/eggs.git
  */
 
 /* Initialize board's peripherals */

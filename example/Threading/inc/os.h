@@ -1,9 +1,8 @@
 /* Prototypes of core Operating System procedures and functions
  *
- * author: Paweł Balawender
- * github.com@eerio
+ * author: Pawel Balawender
+ * https://github.com/eerio/eggs.git
  */
-#include<stm32f0xx.h>
 
 /* Infinite loop function, implemented in startup_stm32f091xc.s file */
 void LoopForever(void);
