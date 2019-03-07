@@ -12,8 +12,8 @@
 #define LED_OFF() (LED_PORT->BRR |= (1 << LED_PIN))
 #define LED_TOGGLE() (LED_PORT->ODR ^= (1 << LED_PIN))
 
-uint8_t SPI_RX_buffer[RX_BUFFER_SIZE] = {0};
-uint8_t SPI_TX_buffer[TX_BUFFER_SIZE] = {0};
+uint8_t SPI_RX_buffer[SPI_RX_BUFFER_SIZE] = {0};
+uint8_t SPI_TX_buffer[SPI_TX_BUFFER_SIZE] = {0};
 uint32_t SPI_RX_ind = 0;
 
 /* TODO: Make it timer- and interruption-based, so it's accurate,
