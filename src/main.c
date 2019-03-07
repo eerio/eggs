@@ -15,8 +15,13 @@
 #include<common.h>
 #include<spi.h>
 #include<sd.h>
+#include<pff.h>
 
 void OS_setup(void);
+
+void die(FRESULT rc) {
+    while(1) { /* Failed with passed rc */ }
+}
 
 int main(void) {
     /* At this point we assume that the stack is initialized,
@@ -28,9 +33,25 @@ int main(void) {
      */
     init_sys();
     init_sd();
+
+    FATFS fatfs;
+    FRESULT rc = pf_mount(&fatfs);
+    unsigned int br;
+    uint8_t buff[64];
+
+    if (rc) die(rc);
+
+    rc = pf_open("hi.txt");
+    if (rc) die(rc);
+
+    rc = 0;
+    br = 1;
+    while(!rc && br) {
+        rc = pf_read(buff, sizeof(buff), &br);
+    }
+    if (rc) die(rc);
     
     disable_spi();
-
     /* Main thread after return from the main function goes to an infinite
      * loop in the startup_stm32f091xc.s file */
     return 0;
