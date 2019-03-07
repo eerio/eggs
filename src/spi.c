@@ -8,16 +8,18 @@
 #include<spi.h>
 #include<dma.h>
 
+#define RCC_SPI_SD_EN (RCC_APB2ENR_SPI1EN);
+
 void spi_send(uint8_t* x) {
-    SPI1->CR2 |= SPI_CR2_RXDMAEN;
-    for(unsigned int i=0; i < TX_BUFFER_SIZE; ++i) {
+    SPI_SD->CR2 |= SPI_CR2_RXDMAEN;
+    for(unsigned int i=0; i < SPI_TX_BUFFER_SIZE; ++i) {
         SPI_TX_buffer[i] = x[i];
     }
-    SPI1->CR2 |= SPI_CR2_TXDMAEN;
-    while (SPI1->CR2 & SPI_CR2_TXDMAEN) {}
-    while (SPI1->SR & SPI_SR_BSY) {}
+    SPI_SD->CR2 |= SPI_CR2_TXDMAEN;
+    while (SPI_SD->CR2 & SPI_CR2_TXDMAEN) {}
+    while (SPI_SD->SR & SPI_SR_BSY) {}
     
-    SPI_RX_ind += TX_BUFFER_SIZE;
+    SPI_RX_ind += SPI_TX_BUFFER_SIZE;
 }
 
 uint8_t* spi_read(void) {
@@ -42,7 +44,7 @@ void setup_spi(void) {
     /* Enable GPIO port A */
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
     /* Enable SPI #1 clock */
-    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+    RCC->APB2ENR |= RCC_SPI_SD_EN;
     
     /* Set AF0 mode for every pin */
     GPIOA->MODER &= 0xFFFF00FF;
@@ -72,51 +74,51 @@ void setup_spi(void) {
 
 
     /* Data mode: 2-line unidirectional */
-    SPI1->CR1 &= ~SPI_CR1_BIDIMODE;
+    SPI_SD->CR1 &= ~SPI_CR1_BIDIMODE;
     /* Full-duplex mode */
-    SPI1->CR1 &= ~SPI_CR1_RXONLY;
+    SPI_SD->CR1 &= ~SPI_CR1_RXONLY;
     /* Set freq to 8Mhz / 32 = 250kHz */
-    SPI1->CR1 &= SPI_CR1_BR;
-    SPI1->CR1 |= (0b100) << SPI_CR1_BR_Pos;
+    SPI_SD->CR1 &= SPI_CR1_BR;
+    SPI_SD->CR1 |= (0b100) << SPI_CR1_BR_Pos;
     /* Master configuration */
-    SPI1->CR1 |= SPI_CR1_MSTR;
+    SPI_SD->CR1 |= SPI_CR1_MSTR;
     /* Clock to 0 when idle */
-    SPI1->CR1 &= ~SPI_CR1_CPOL;
+    SPI_SD->CR1 &= ~SPI_CR1_CPOL;
     /* First clock transition is the first data capture edge */
-    SPI1->CR1 &= ~SPI_CR1_CPHA;
+    SPI_SD->CR1 &= ~SPI_CR1_CPHA;
     
     /* MSB first */
-    SPI1->CR1 &= ~SPI_CR1_LSBFIRST;
+    SPI_SD->CR1 &= ~SPI_CR1_LSBFIRST;
     /* Frame format: SPI Motorola mode */
-    SPI1->CR2 &= ~SPI_CR2_FRF;
+    SPI_SD->CR2 &= ~SPI_CR2_FRF;
     /* Transfer data length: 8-bit */
-    SPI1->CR2 &= ~SPI_CR2_DS;
-    SPI1->CR2 |= 0b0111 << SPI_CR2_DS_Pos;
+    SPI_SD->CR2 &= ~SPI_CR2_DS;
+    SPI_SD->CR2 |= 0b0111 << SPI_CR2_DS_Pos;
     
     /* Disable CRC */
-    SPI1->CR1 &= ~SPI_CR1_CRCEN;
+    SPI_SD->CR1 &= ~SPI_CR1_CRCEN;
     /* RXNE if the FIFO level >= 8 bit */
-    // SPI1->CR2 |= SPI_CR2_FRXTH;
+    // SPI_SD->CR2 |= SPI_CR2_FRXTH;
     
     /* Hardware slave management */
-    SPI1->CR1 &= ~SPI_CR1_SSM;
+    SPI_SD->CR1 &= ~SPI_CR1_SSM;
     /* Send NSS pulse between two data transfers */
-    //SPI1->CR2 |= SPI_CR2_NSSP;
+    //SPI_SD->CR2 |= SPI_CR2_NSSP;
     /* Slave Select Output enable */
-    SPI1->CR2 |= SPI_CR2_SSOE;
+    SPI_SD->CR2 |= SPI_CR2_SSOE;
 
     /* Enable DMA. Procedure: p. 770 */
-    // SPI1->CR2 |= SPI_CR2_RXDMAEN;
+    // SPI_SD->CR2 |= SPI_CR2_RXDMAEN;
     RCC->AHBENR |= RCC_AHBENR_DMA1EN;
     DMA1->CSELR &= 0xFFFFF00F;
     DMA1->CSELR |= (0b0011 << 4);
     DMA1->CSELR |= (0b0011 << 8);
     configure_DMA(); 
-    // SPI1->CR2 |= SPI_CR2_TXDMAEN;
+    // SPI_SD->CR2 |= SPI_CR2_TXDMAEN;
 
     /* Enable SPI */
     /* At this point MOSI line and clock are being pulled down */
-    SPI1->CR1 |= SPI_CR1_SPE;
+    SPI_SD->CR1 |= SPI_CR1_SPE;
 
     /* Start DMA */
     start_DMA();
@@ -129,19 +131,19 @@ void disable_spi(void) {
     disable_dma();
     
     /* Wait until FTLVL[1:] == 0 (no more data to transmit) */
-    while (SPI1->SR & SPI_SR_FTLVL) {}
+    while (SPI_SD->SR & SPI_SR_FTLVL) {}
     /* Wait until BSY = 0 (the last data frame is processed) */
-    while (SPI1->SR & SPI_SR_BSY) {}
+    while (SPI_SD->SR & SPI_SR_BSY) {}
     /* Disable SPI */
-    SPI1->CR1 &= ~SPI_CR1_SPE;
+    SPI_SD->CR1 &= ~SPI_CR1_SPE;
 
     /* its a workaround; without this, frlvl never drops to 0 */
-    SPI1->DR;
+    SPI_SD->DR;
 
     /* Read data until FRLVL[1:0] == 00 (read all the received data) */
-    while(SPI1->SR & SPI_SR_FRLVL) {}
+    while(SPI_SD->SR & SPI_SR_FRLVL) {}
 
     /* Disable DMA TX and RX buffers in SPI */
-    SPI1->CR2 &= ~(SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN);
+    SPI_SD->CR2 &= ~(SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN);
 }
 
