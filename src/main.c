@@ -13,11 +13,30 @@
 #include<config.h>
 #include<os.h>
 #include<common.h>
+#include<spi.h>
+#include<sd.h>
 
+void OS_setup(void);
 
 int main(void) {
-    /* Configure board's peripherals */
+    /* At this point we assume that the stack is initialized,
+     * .data segment is copied to SRAM, .bss segment is zero-filled,
+     * SystemCoreClock variable is set to current system clock source,
+     * internal clocks are initialized and __libc_init_array routine has
+     * been called. These things are done by ResetHandler in
+     * startup_<device>.s file and SystemInit func in system_<device_fam>.c
+     */
     init_sys();
+    init_sd();
+    
+    disable_spi();
+
+    /* Main thread after return from the main function goes to an infinite
+     * loop in the startup_stm32f091xc.s file */
+    return 0;
+}
+
+void OS_setup(void) {
     /* Setup the operating system environment */
     init_os();
 
@@ -28,9 +47,5 @@ int main(void) {
 
     /* Start executing the threads */
     start_os();
-
-    /* Main thread after return from the main function goes to an infinite
-     * loop in the startup_stm32f091xc.s file */
-    return 0;
 }
 
