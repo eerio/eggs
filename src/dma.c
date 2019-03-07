@@ -40,8 +40,13 @@ void configure_DMA(void) {
 
     /* Transfer complete interrupt enable */
     DMA_SPI_TX->CCR |= DMA_CCR_TCIE;
+#ifdef USE_DEFAULT_SPI_SD_TX_DMA
     NVIC_EnableIRQ(DMA1_Ch2_3_DMA2_Ch1_2_IRQn);
     NVIC_SetPriority(DMA1_Ch2_3_DMA2_Ch1_2_IRQn, 0);
+#else
+    NVIC_EnableIRQ(DMA1_Ch4_7_DMA2_Ch3_5_IRQn);
+    NVIC_SetPriority(DMA1_Ch4_7_DMA2_Ch3_5_IRQn, 0);
+#endif
 }
 
 void start_DMA(void) {
