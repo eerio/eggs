@@ -12,7 +12,6 @@
  */
 #include<config.h>
 #include<pff.h>
-#include<stdio.h>
 
 void die(FRESULT rc);
 void test_pff(void);
