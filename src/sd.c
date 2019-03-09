@@ -160,3 +160,7 @@ void read_block(void) {
     for (int i=0; i < 86; ++i) spi_send(blank);
 }
 
+DRESULT sd_readp(BYTE* buff, DWORD sector, UINT offset, UINT count) {
+    return RES_OK;
+}
+

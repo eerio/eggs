@@ -27,9 +27,7 @@ DRESULT disk_readp (
 	UINT count		/* Byte count (bit15:destination) */
 )
 {
-	DRESULT res;
-
-	return res;
+	return sd_readp(buff, sector, offset, count);
 }
 
 
