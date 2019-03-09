@@ -12,9 +12,13 @@
  */
 #include<config.h>
 #include<pff.h>
+#include<sd.h>
 
 void die(FRESULT rc);
 void test_pff(void);
+
+uint8_t buf[1024] = {0};
+UINT counter;
 
 int main(void) {
     /* At this point we assume that the stack is initialized,
@@ -25,8 +29,10 @@ int main(void) {
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
     init_sys();
-    test_pff();
+    sd_initialize();
+    sd_readp(buf, 1, 0, 512);
     quit_sys();
+
     /* Main thread after return from the main function goes to an infinite
      * loop in the startup_stm32f091xc.s file */
     return 0;
