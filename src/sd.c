@@ -7,6 +7,7 @@
 #include<spi.h>
 #include<common.h>
 #include<diskio.h>
+#include<string.h>
 
 #define R1_PARAMETER_ERROR (1U << 6)
 #define R1_ADDRESS_ERROR (1U << 5)
@@ -161,6 +162,14 @@ void read_block(void) {
 }
 
 DRESULT sd_readp(BYTE* buff, DWORD sector, UINT offset, UINT count) {
+    uint8_t cmd[6] = {0x51, 0x00, 0x00, 0x00, 0x00, 0x00};
+    for (unsigned int i=4; i >= 1; --i) {
+        cmd[i] = (sector >> (i * 8)) & 0xFF;
+    }
+    spi_send(cmd);
+    /* Send ticks for 512 bytes*/
+    for (unsigned int i=0; i < 512; ++i) spi_send(blank);
+    memcpy(buff, spi_read() - 512 + offset, count);
     return RES_OK;
 }
 
