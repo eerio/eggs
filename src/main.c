@@ -11,13 +11,7 @@
  *
  */
 #include<config.h>
-#include<os.h>
-#include<common.h>
-#include<spi.h>
-#include<sd.h>
 #include<pff.h>
-
-void OS_setup(void);
 
 void die(FRESULT rc) {
     while(1) { /* Failed with passed rc */ }
@@ -50,22 +44,9 @@ int main(void) {
     }
     if (rc) die(rc);
     
-    disable_spi();
+    quit_sys();
     /* Main thread after return from the main function goes to an infinite
      * loop in the startup_stm32f091xc.s file */
     return 0;
-}
-
-void OS_setup(void) {
-    /* Setup the operating system environment */
-    init_os();
-
-    /* Add threads to perform */
-    init_task(handler_blinking_fast);
-    init_task(handler_blinking_medium);
-    init_task(handler_blinking_slow);
-
-    /* Start executing the threads */
-    start_os();
 }
 

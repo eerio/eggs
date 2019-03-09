@@ -14,6 +14,10 @@ void init_sys(void) {
     setup_spi();
 }
 
+void quit_sys(void) {
+    disable_spi();
+}
+
 /* Enable GPIOA and set the correct pin modes for PA5, PA6 and PA7 */
 void init_leds(void) {
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
