@@ -30,7 +30,7 @@ int main(void) {
      */
     init_sys();
     sd_initialize();
-    sd_readp(buf, 1, 0, 512);
+    sd_readp(buf, 0, 0, 512);
     quit_sys();
 
     /* Main thread after return from the main function goes to an infinite

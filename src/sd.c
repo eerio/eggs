@@ -167,9 +167,12 @@ DRESULT sd_readp(BYTE* buff, DWORD sector, UINT offset, UINT count) {
         cmd[i] = (sector >> (i * 8)) & 0xFF;
     }
     spi_send(cmd);
-    /* Send ticks for 512 bytes*/
-    for (unsigned int i=0; i < 512; ++i) spi_send(blank);
+    /* Send ticks for 512 bytes of data + 2 bytes of CRC */
+    spi_send(blank);
+    for (unsigned int i=0; i < 512/6 + 4; ++i) spi_send(blank);
     memcpy(buff, spi_read() - 512 + offset, count);
+
+    /* thats a workaround, otherwise spi stretches miso down */
     return RES_OK;
 }
 
