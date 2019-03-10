@@ -160,10 +160,26 @@ DRESULT sd_readp(BYTE* buff, DWORD sector, UINT offset, UINT count) {
         cmd[i] = (sector >> (i * 8)) & 0xFF;
     }
     spi_send(cmd);
+    /* Receive the R1 response */
+    spi_send(blank);
+    if (*spi_read()) while(1) { /* Communication error */ }
+
+    /* Wait for the data block beginning with 0xFE token for a while */
+    uint8_t* addr_ok = NULL;
+    uint8_t* addr;
+    for (int i=0; i < 8 && !addr_ok; ++i) {
+        addr = spi_read()+1;
+        for (int j=0; j < 6; ++j) {
+            /* +1 cause 0xfe we dont want */
+            if (addr[j] == 0xFE) addr_ok = &addr[j+1];
+        }
+        spi_send(blank);
+    }
+
     /* Send ticks for 512 bytes of data + 2 bytes of CRC */
     spi_send(blank);
-    for (unsigned int i=0; i < 512/6 + 4; ++i) spi_send(blank);
-    memcpy(buff, spi_read() - 512 + offset, count);
+    for (unsigned int i=0; i < (512+2)/6; ++i) spi_send(blank);
+    memcpy(buff, addr_ok+offset, count);
 
     /* thats a workaround, otherwise spi stretches miso down */
     return RES_OK;

@@ -29,8 +29,8 @@ int main(void) {
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
     init_sys();
-    //sd_initialize();
-    //sd_readp(buf, 0, 0, 512);
+    sd_initialize();
+    sd_readp(buf, 0, 0, 512);
     test_pff();
     quit_sys();
 
