@@ -154,13 +154,6 @@ DSTATUS sd_initialize(void) {
     return 0;
 }
 
-
-void read_block(void) {
-    spi_send(cmd17);
-    /* Send 512 clock ticks; 512/6=85.(3) */
-    for (int i=0; i < 86; ++i) spi_send(blank);
-}
-
 DRESULT sd_readp(BYTE* buff, DWORD sector, UINT offset, UINT count) {
     uint8_t cmd[6] = {0x51, 0x00, 0x00, 0x00, 0x00, 0x00};
     for (unsigned int i=4; i >= 1; --i) {
