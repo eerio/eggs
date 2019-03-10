@@ -61,14 +61,13 @@ typedef struct {
     OCR OCRValue;
 } ResponseR3;
 
+void read_block(void);
 typedef struct {
     ResponseR1 R1;
     uint4_t command_version;
     uint4_t voltage_accepted;
     uint8_t check_pattern;
 } ResponseR7;
-
-void read_block(void);
 
 
 
@@ -155,10 +154,11 @@ DSTATUS sd_initialize(void) {
 }
 
 DRESULT sd_readp(BYTE* buff, DWORD sector, UINT offset, UINT count) {
-    uint8_t cmd[6] = {0x51, 0x00, 0x00, 0x00, 0x00, 0x00};
-    for (unsigned int i=4; i >= 1; --i) {
-        cmd[i] = (sector >> (i * 8)) & 0xFF;
-    }
+    uint8_t cmd[6] = {0x51, 0x00, 0x00, 0x00, 0x00, 0x01};
+    cmd[4] = sector & 0xFF;
+    cmd[3] = (sector & 0xFF00) >> 8;
+    cmd[2] = (sector & 0xFF0000) >> 16;
+    cmd[1] = (sector & 0xFF000000) >> 24;
     spi_send(cmd);
     /* Receive the R1 response */
     spi_send(blank);
