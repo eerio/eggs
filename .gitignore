@@ -1,7 +1,8 @@
 .gdb_history
 dest/*
 *.swp
-
+tags
+*.geany
 
 # Prerequisites
 *.d
