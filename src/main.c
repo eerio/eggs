@@ -62,7 +62,7 @@ void test_pff(void) {
 	FRESULT rc = pf_mount(&fatfs);
 	if (rc) die(rc);
 
-	rc = pf_open("MESSAGE.TXT");
+	rc = pf_open("hi.txt");
 	if (rc) die(rc);
 
 	for (;;) {
