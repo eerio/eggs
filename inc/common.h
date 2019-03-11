@@ -12,11 +12,6 @@
 extern uint8_t SPI_RX_buffer[], SPI_TX_buffer[];
 extern uint32_t SPI_RX_ind;
 
-/* Handlers. They periodically toggle the User LED with different freq. */
-void handler_blinking_fast(void);
-void handler_blinking_medium(void);
-void handler_blinking_slow(void);
-
 /* send command to openocd */
 void send_command(int, void*);
 

@@ -16,29 +16,6 @@ uint8_t SPI_RX_buffer[SPI_RX_BUFFER_SIZE] = {0};
 uint8_t SPI_TX_buffer[SPI_TX_BUFFER_SIZE] = {0};
 uint32_t SPI_RX_ind = 0;
 
-/* TODO: Shouldn't there be some irq-disables/enables? */
-void handler_blinking_fast(void) {
-    while(1) {
-        GPIOA->ODR ^= (1 << 5);
-        delay(100000);
-    }
-}
-
-void handler_blinking_medium(void) {
-    while(1) {
-        GPIOA->ODR ^= (1 << 6);
-        delay(50000);
-    }
-}
-
-void handler_blinking_slow(void) {
-    while(1) {
-        GPIOA->ODR ^= (1 << 7);
-        delay(200000);
-    }
-}
-
-
 void send_command(int cmd, void* msg) {
     __asm__(
         "mov r0, %[cmd];"
