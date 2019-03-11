@@ -23,7 +23,7 @@ void spi_send(uint8_t* x) {
 }
 
 uint8_t* spi_read(void) {
-    return &SPI_RX_buffer[SPI_RX_ind - 4 - 1];
+    return &SPI_RX_buffer[(SPI_RX_ind-5) % SPI_RX_BUFFER_SIZE];
 }
 
 /* Mode: full-duplex, master
