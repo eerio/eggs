@@ -175,6 +175,7 @@ DRESULT sd_readp(BYTE* buff, DWORD sector, UINT offset, UINT count) {
         }
         spi_send(blank);
     }
+    if (!addr_ok) while(1) { /* Timeout error */ }
 
     /* Send ticks for 512 bytes of data + 2 bytes of CRC */
     spi_send(blank);
