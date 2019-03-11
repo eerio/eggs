@@ -96,6 +96,5 @@ void test_pff(void) {
 	if (rc) die(rc);
 #endif
 
-	for (;;) ;    
 }
 
