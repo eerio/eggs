@@ -168,10 +168,10 @@ DRESULT sd_readp(BYTE* buff, DWORD sector, UINT offset, UINT count) {
     uint8_t* addr_ok = NULL;
     uint8_t* addr;
     for (int i=0; i < 8 && !addr_ok; ++i) {
-        addr = spi_read()+1;
+        addr = spi_read();
         for (int j=0; j < 6; ++j) {
-            /* +1 cause 0xfe we dont want */
-            if (addr[j] == 0xFE) addr_ok = &addr[j+1];
+            /* +1 cause we dont want 0xfe token */
+            if (*(addr-j) == 0xFE) addr_ok = addr-j + 1;
         }
         spi_send(blank);
     }
