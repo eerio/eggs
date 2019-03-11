@@ -29,8 +29,11 @@ $(DEST)/main.hex: $(DEST)/main.elf
 $(DEST)/main.dbg: $(DEST)/main.elf
 	arm-none-eabi-objcopy --only-keep-debug $< $@
 
-$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ)
+$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ) dest/delay.o
 	$(CC) $(LINK_FLAGS) $^ -o $@
+
+dest/delay.o: src/delay.s
+	$(CC) $(COMP_FLAGS) $< -o $@
 
 $(start_os_OBJ): $(start_os_SRC)
 	$(CC) $(COMP_FLAGS) $< -o $@
