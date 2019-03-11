@@ -16,15 +16,6 @@ uint8_t SPI_RX_buffer[SPI_RX_BUFFER_SIZE] = {0};
 uint8_t SPI_TX_buffer[SPI_TX_BUFFER_SIZE] = {0};
 uint32_t SPI_RX_ind = 0;
 
-/* TODO: Make it timer- and interruption-based, so it's accurate,
- *          [time-in-seconds-or-minutes-or-sth]-programmable and
- *          another interrupts occuring will not affect it
- * TODO: It should be NOP()-based
- */
-void delay (volatile unsigned int time) {
-    while (time > 0) {--time;}
-}
-
 /* TODO: Shouldn't there be some irq-disables/enables? */
 void handler_blinking_fast(void) {
     while(1) {
