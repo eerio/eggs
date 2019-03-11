@@ -33,8 +33,8 @@ int main(void) {
     send_command(0x05 /*irq id */, m);
 
     init_sys();
-    // sd_initialize();
-    // sd_readp(buf, 0, 0, 512);
+    //sd_initialize();
+    //sd_readp(buf, 0x00002000, 0, 512);
     test_pff();
     quit_sys();
 
