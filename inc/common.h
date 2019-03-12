@@ -1,6 +1,6 @@
 /* Collection of miscellaneous and commonly-used functions and macros
  *
- * author: Paweł Balawender
+ * author: Pawel Balawender
  * github.com@eerio
  */
 #include<stm32f0xx.h>
@@ -11,7 +11,4 @@
 
 extern uint8_t SPI_RX_buffer[], SPI_TX_buffer[];
 extern uint32_t SPI_RX_ind;
-
-/* send command to openocd */
-void send_command(int, void*);
 

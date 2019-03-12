@@ -16,14 +16,3 @@ uint8_t SPI_RX_buffer[SPI_RX_BUFFER_SIZE] = {0};
 uint8_t SPI_TX_buffer[SPI_TX_BUFFER_SIZE] = {0};
 uint32_t SPI_RX_ind = 0;
 
-void send_command(int cmd, void* msg) {
-    __asm__(
-        "mov r0, %[cmd];"
-        "mov r1, %[msg];"
-        "bkpt #0xAB"
-          :
-          : [cmd] "r" (cmd), [msg] "r" (msg)
-          : "r0", "r1", "memory"
-          );
-}
-

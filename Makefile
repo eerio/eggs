@@ -29,8 +29,11 @@ $(DEST)/main.hex: $(DEST)/main.elf
 $(DEST)/main.dbg: $(DEST)/main.elf
 	arm-none-eabi-objcopy --only-keep-debug $< $@
 
-$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ) dest/delay.o
+$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ) dest/delay.o dest/semihosting.o
 	$(CC) $(LINK_FLAGS) $^ -o $@
+
+dest/semihosting.o: src/semihosting.s
+	$(CC) $(COMP_FLAGS) $< -o $@
 
 dest/delay.o: src/delay.s
 	$(CC) $(COMP_FLAGS) $< -o $@
