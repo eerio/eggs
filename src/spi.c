@@ -12,7 +12,7 @@
 #define RX_BUFFER_SIZE (2048U)
 
 uint8_t tx_buffer[TX_BUFFER_SIZE], rx_buffer[RX_BUFFER_SIZE];
-uint16_t rx_index=0;
+uint32_t rx_index=0;
 
 void spi_send(uint8_t* x) {
     SPI_SD->CR2 |= SPI_CR2_RXDMAEN;
@@ -117,7 +117,7 @@ void setup_spi(void) {
     DMA1->CSELR &= 0xFFFFF00F;
     DMA1->CSELR |= (0b0011 << 4);
     DMA1->CSELR |= (0b0011 << 8);
-    configure_DMA(); 
+    configure_DMA(tx_buffer, rx_buffer); 
     // SPI_SD->CR2 |= SPI_CR2_TXDMAEN;
 
     /* Enable SPI */

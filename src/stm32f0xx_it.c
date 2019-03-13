@@ -1,6 +1,5 @@
 #include<stm32f0xx.h>
 #include<dma.h>
-#include<common.h>
 
 /* it should be able to make 2 handlers. it creates 1 only always */
 #if defined(USE_DEFAULT_SPI_SD_TX_DMA) || defined(USE_DEFAULT_SPI_SD_RX_DMA)

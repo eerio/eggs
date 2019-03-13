@@ -5,17 +5,19 @@
  * github.com@eerio
  */
 #include<stm32f0xx.h>
-#include<common.h> /* SD'S SPI TX/RX buffers and their addresses */
 #include<sys.h> /* SPI_SD */
 #include<dma.h>
 
-void configure_DMA(void) {
+#define SPI_TX_BUFFER_SIZE 6U
+#define SPI_RX_BUFFER_SIZE 2048U
+
+void configure_DMA(uint8_t *tx_buffer, uint8_t *rx_buffer) {
     /* Peripheral: SD's SPI */
     DMA_SPI_TX->CPAR = (uint32_t)(&(SPI_SD->DR));
     DMA_SPI_RX->CPAR = (uint32_t)(&(SPI_SD->DR));
     /* Memory address: buffers */
-    DMA_SPI_TX->CMAR = (uint32_t)(&SPI_TX_buffer);
-    DMA_SPI_RX->CMAR = (uint32_t)(&SPI_RX_buffer);
+    DMA_SPI_TX->CMAR = (uint32_t)(tx_buffer);
+    DMA_SPI_RX->CMAR = (uint32_t)(rx_buffer);
     /* Not to cause a buffer overflow, set CNDTR to buffers' sizes */
     DMA_SPI_TX->CNDTR |= (SPI_TX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
     DMA_SPI_RX->CNDTR |= (SPI_RX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);

@@ -5,7 +5,6 @@
  */
 #include<sd.h>
 #include<spi.h>
-#include<common.h>
 #include<diskio.h>
 #include<string.h>
 

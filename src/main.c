@@ -13,7 +13,7 @@
 #include<config.h>
 #include<pff.h>
 #include<sd.h>
-#include<common.h>
+#include<semihosting.h>
 
 void die(FRESULT rc);
 void test_pff(void);
