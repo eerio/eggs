@@ -42,6 +42,7 @@ uint8_t cmd55[] = {0x77, 0, 0, 0, 0, 0x65}; /* r1 */
 /* hcs = 1 to control sdhc */
 uint8_t acmd41[] = {0x69, 0x40, 0, 0, 0, 0x77}; /* r1 */
 uint8_t cmd17[] = {0x51, 0, 0, 0, 0, 0xFF}; /* r1 */
+uint8_t cmd9[] = {0x49, 0, 0, 0, 0, 0x69}; /* read csd */
 
 
 typedef uint8_t bool;
@@ -149,6 +150,9 @@ DSTATUS sd_initialize(void) {
         /* Version >= 2.00 SD Standard Capacity card */
         standard_cap = 1;
     }
+
+    spi_send(cmd9);
+    for (int i=0; i < 86; i++) spi_send(blank);
 
     return 0;
 }
