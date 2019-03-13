@@ -13,6 +13,12 @@ void configure_DMA(
         uint8_t rx_buffer[],
         uint16_t tx_buffer_size,
         uint16_t rx_buffer_size) {
+    /* Enable DMA. Procedure: p. 770 */
+    RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+    DMA1->CSELR &= 0xFFFFF00F;
+    DMA1->CSELR |= (0b0011 << 4);
+    DMA1->CSELR |= (0b0011 << 8);
+
     /* Peripheral: SD's SPI */
     DMA_SPI_TX->CPAR = (uint32_t)(&(SPI_SD->DR));
     DMA_SPI_RX->CPAR = (uint32_t)(&(SPI_SD->DR));

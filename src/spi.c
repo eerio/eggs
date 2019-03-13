@@ -112,14 +112,7 @@ void setup_spi(void) {
     /* Slave Select Output enable */
     SPI_SD->CR2 |= SPI_CR2_SSOE;
 
-    /* Enable DMA. Procedure: p. 770 */
-    // SPI_SD->CR2 |= SPI_CR2_RXDMAEN;
-    RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-    DMA1->CSELR &= 0xFFFFF00F;
-    DMA1->CSELR |= (0b0011 << 4);
-    DMA1->CSELR |= (0b0011 << 8);
     configure_DMA(tx_buffer, rx_buffer, TX_BUFFER_SIZE, RX_BUFFER_SIZE); 
-    // SPI_SD->CR2 |= SPI_CR2_TXDMAEN;
 
     /* Enable SPI */
     /* At this point MOSI line and clock are being pulled down */
