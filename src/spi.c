@@ -118,7 +118,7 @@ void setup_spi(void) {
     DMA1->CSELR &= 0xFFFFF00F;
     DMA1->CSELR |= (0b0011 << 4);
     DMA1->CSELR |= (0b0011 << 8);
-    configure_DMA(tx_buffer, rx_buffer); 
+    configure_DMA(tx_buffer, rx_buffer, TX_BUFFER_SIZE, RX_BUFFER_SIZE); 
     // SPI_SD->CR2 |= SPI_CR2_TXDMAEN;
 
     /* Enable SPI */

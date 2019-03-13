@@ -8,10 +8,11 @@
 #include<sys.h> /* SPI_SD */
 #include<dma.h>
 
-#define SPI_TX_BUFFER_SIZE (6U)
-#define SPI_RX_BUFFER_SIZE (2048U*12)
-
-void configure_DMA(uint8_t tx_buffer[], uint8_t rx_buffer[]) {
+void configure_DMA(
+        uint8_t tx_buffer[],
+        uint8_t rx_buffer[],
+        uint16_t tx_buffer_size,
+        uint16_t rx_buffer_size) {
     /* Peripheral: SD's SPI */
     DMA_SPI_TX->CPAR = (uint32_t)(&(SPI_SD->DR));
     DMA_SPI_RX->CPAR = (uint32_t)(&(SPI_SD->DR));
@@ -19,8 +20,8 @@ void configure_DMA(uint8_t tx_buffer[], uint8_t rx_buffer[]) {
     DMA_SPI_TX->CMAR = (uint32_t)(tx_buffer);
     DMA_SPI_RX->CMAR = (uint32_t)(rx_buffer);
     /* Not to cause a buffer overflow, set CNDTR to buffers' sizes */
-    DMA_SPI_TX->CNDTR |= (SPI_TX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
-    DMA_SPI_RX->CNDTR |= (SPI_RX_BUFFER_SIZE << DMA_CNDTR_NDT_Pos);
+    DMA_SPI_TX->CNDTR |= (tx_buffer_size << DMA_CNDTR_NDT_Pos);
+    DMA_SPI_RX->CNDTR |= (rx_buffer_size << DMA_CNDTR_NDT_Pos);
     /* Memory to peripheral mode */
     DMA_SPI_TX->CCR &= ~DMA_CCR_MEM2MEM;
     DMA_SPI_RX->CCR &= ~DMA_CCR_MEM2MEM;
@@ -66,7 +67,7 @@ void start_DMA(void) {
 
 void disable_DMA(void) {
     /* Wait till transfer finished */
-    while(DMA_SPI_TX->CNDTR != SPI_TX_BUFFER_SIZE) {}
+    while(DMA_SPI_TX->CNDTR != 6) {}
     /* Disable channels */
     DMA_SPI_TX->CCR &= ~DMA_CCR_EN;
     DMA_SPI_RX->CCR &= ~DMA_CCR_EN;
