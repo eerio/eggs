@@ -5,24 +5,29 @@
  */
 #include<stm32f0xx.h>
 #include<sys.h> /* SPI_SD */
-#include<common.h>
 #include<spi.h>
 #include<dma.h>
 
+#define TX_BUFFER_SIZE (6U)
+#define RX_BUFFER_SIZE (2048U)
+
+uint8_t tx_buffer[TX_BUFFER_SIZE], rx_buffer[RX_BUFFER_SIZE];
+uint16_t rx_index=0;
+
 void spi_send(uint8_t* x) {
     SPI_SD->CR2 |= SPI_CR2_RXDMAEN;
-    for(unsigned int i=0; i < SPI_TX_BUFFER_SIZE; ++i) {
-        SPI_TX_buffer[i] = x[i];
+    for(unsigned int i=0; i < TX_BUFFER_SIZE; ++i) {
+        tx_buffer[i] = x[i];
     }
     SPI_SD->CR2 |= SPI_CR2_TXDMAEN;
     while (SPI_SD->CR2 & SPI_CR2_TXDMAEN) {}
     while (SPI_SD->SR & SPI_SR_BSY) {}
     
-    SPI_RX_ind += SPI_TX_BUFFER_SIZE;
+    rx_index += TX_BUFFER_SIZE;
 }
 
 uint8_t* spi_read(void) {
-    return &SPI_RX_buffer[(SPI_RX_ind-5) % SPI_RX_BUFFER_SIZE];
+    return &rx_buffer[(rx_index-5) % RX_BUFFER_SIZE];
 }
 
 /* Mode: full-duplex, master
