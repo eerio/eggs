@@ -150,8 +150,8 @@ DSTATUS sd_initialize(void) {
         standard_cap = 1;
     }
 
-    spi_send(cmd9);
-    for (int i=0; i < 86; i++) spi_send(blank);
+    //spi_send(cmd9);
+    //for (int i=0; i < 86; i++) spi_send(blank);
 
     return 0;
 }
