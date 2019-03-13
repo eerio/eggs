@@ -9,9 +9,10 @@
 #include<dma.h>
 
 #define TX_BUFFER_SIZE (6U)
-#define RX_BUFFER_SIZE (2048U)
+#define RX_BUFFER_SIZE (2048U * 12)
 
-uint8_t tx_buffer[TX_BUFFER_SIZE], rx_buffer[RX_BUFFER_SIZE];
+uint8_t tx_buffer[TX_BUFFER_SIZE]={0};
+uint8_t rx_buffer[RX_BUFFER_SIZE]={0};
 uint32_t rx_index=0;
 
 void spi_send(uint8_t* x) {

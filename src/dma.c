@@ -8,10 +8,10 @@
 #include<sys.h> /* SPI_SD */
 #include<dma.h>
 
-#define SPI_TX_BUFFER_SIZE 6U
-#define SPI_RX_BUFFER_SIZE 2048U
+#define SPI_TX_BUFFER_SIZE (6U)
+#define SPI_RX_BUFFER_SIZE (2048U*12)
 
-void configure_DMA(uint8_t *tx_buffer, uint8_t *rx_buffer) {
+void configure_DMA(uint8_t tx_buffer[], uint8_t rx_buffer[]) {
     /* Peripheral: SD's SPI */
     DMA_SPI_TX->CPAR = (uint32_t)(&(SPI_SD->DR));
     DMA_SPI_RX->CPAR = (uint32_t)(&(SPI_SD->DR));
