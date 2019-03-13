@@ -5,8 +5,6 @@
  */
 #include<stm32f0xx.h>
 
-#define SPI_SD (SPI1)
-
 /* Initialize SPI peripheral */
 void setup_spi(void);
 

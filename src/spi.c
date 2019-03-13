@@ -4,11 +4,10 @@
  * github.com@eerio
  */
 #include<stm32f0xx.h>
+#include<sys.h> /* SPI_SD */
 #include<common.h>
 #include<spi.h>
 #include<dma.h>
-
-#define RCC_SPI_SD_EN (RCC_APB2ENR_SPI1EN);
 
 void spi_send(uint8_t* x) {
     SPI_SD->CR2 |= SPI_CR2_RXDMAEN;

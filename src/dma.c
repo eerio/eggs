@@ -6,7 +6,7 @@
  */
 #include<stm32f0xx.h>
 #include<common.h> /* SD'S SPI TX/RX buffers and their addresses */
-#include<spi.h> /* SPI_SD */
+#include<sys.h> /* SPI_SD */
 #include<dma.h>
 
 void configure_DMA(void) {
