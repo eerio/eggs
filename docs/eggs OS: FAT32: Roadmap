@@ -1,0 +1,16 @@
+Hi!
+
+I always wanted my STM32 to be able to read normal files from a USB-stick, SD card or some other handy memory storage device. Since my STM32F091 doesn't have the USB interface (neither host nor device), I have decided to go with SD cards and communicate with them by the SPI interface, which is documented at least as robustly as the native SDIO interface. What will we need for that? Certainly a FAT32 File System driver. I didn't want to write it all by myself (unnecessary effort IMO, it would only create a lot of space for bugs and code design mistakes), so I went with ChaN's [Petit FAT File System Module](http://elm-chan.org/fsw/ff/00index_p.html). On the main site of this module, in the **Disk I/O Interface** section we can see that we will have to implement three procedures for it to work with our storage device:
+1. disk_initialize
+2. disk_readp
+3. disk_writep
+Even without looking in the description of these commands, we can tell that probably we gonna want to communicate with our SD card in order to implement them. And since, as I have stated above, we want to perform this communication via SPI, we will also need an SPI driver. And that's what we are going to start in the next post.
+
+The roadmap for now is:
+a) find out how to connect SD card to STM32 board
+b) what's the proper configuration of GPIO pins that we will use?
+c) what SPI functionality are we gonna need for the SD driver?
+and at the end,
+e) how to design this driver?
+
+See you!

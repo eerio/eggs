@@ -1,0 +1,7 @@
+Hi!
+
+My name's Pawel and I've been tampering with μC OS-Dev since January 2019. Initially, the subject I'll write about the most will be μC OS-Dev, because of the main thought behind creating this website was to present to you my fresh project, eggs OS. Why haven't I just wrote a nice README for the Github repository? I like when README files are short and the description of this project will certainly be not :) My goal is to write the description in such a manner that after reading it, you will be able to write your own OS from scratch, without the need to spend hours with nose in your microcontroller's documentation. The second goal is to be able to explain every single decision that I have made during the development using a proper note in the official docs, so other developers that would like to use this code won't have to *believe my word*, but will be able to easily check why is it written in some particular way.
+
+**Task**: create a small, yet functional, Real-Time Operating System for STM32 microcontrollers.
+**Began on**: 17 January 2019
+**Github repository**: [https://github.com/eerio/eggs](https://github.com/eerio/eggs)

@@ -1,0 +1,28 @@
+Hi,
+
+In today's post, I'll show you how have I configured the SPI. Let's start with the pinout. SD card can work in either SPI mode or SD mode. After power-on, it's in the SD mode[1], but we only need to send CMD0 to switch to SPI mode[2], so we don't have to worry about the SD mode pinout. Look at the screenshot below to see the SPI mode pinout:
+[![screen_sd_pinout.png](/a/thumb/3WLdjboZQpKxcC0LX9oEH7AysqAWqOHF6YXqxAmbXydqPCvd27oXFy3nUeeOyk8X/1/)](/a/3WLdjboZQpKxcC0LX9oEH7AysqAWqOHF6YXqxAmbXydqPCvd27oXFy3nUeeOyk8X/1/)
+
+So, what do we know about these pins? At first glance, we can notice that there are 2 GND pins - I am not sure why is that, maybe to reduce the current flowing through pins that sink from them, I couldn't find any note about this design in SDA's documents. Anyway, we just connect this pin to our uC's GND. Then, we have:
+-CS: Chip Select; in STM32 microcontrollers' docs it's called NSS, Slave Select)
+-DI: Data In, so the MOSI (Master Output Slave Input) line in our case
+-DO: Data Out = MISO
+-SCLK: Clock line. As before, we connect it to SPI's CLK line of our uC.
+
+The last pin is Vdd, +3.3V pin, which we will connect to uC, but keeping in mind that the SD card can require up to 200mA current[3], which my uC is not capable of sourcing[4]. But don't worry, current that big can be needed only in data write mode - we will have enough time to determine whether our particular SD Card really needs that or not - every SD Card has this information stored in an internal register, which we will ask for later. Until that, we can be rather sure that there won't be energy problems with the card - you have to check the datasheet of your own board.
+
+We don't configure GND nor Vdd pins, but the MISO's pins we do. How? Let's step through the GPIO registers and what values to put in them.
+MODER: we don't want to do any bit banging, even on the Slave Select line, so we give all the control to SPI peripheral by setting Alternate Function mode for all 4 pins
+AFRL: we've set AF mode, so it'd be good to select some function too. You have to select SPI functions for all the pins. In my case (STM32F091RC) it's:
+- PA4: NSS (AF 0)
+- PA5: MOSI (AF 0)
+- PA6: MISO (AF 0)
+- PA7: SCK (AF 0)
+AFRH: NOP for me, because my pins are all are low pins (PA[4:7]). If you wanted to use Px[8:15] pin, you would have to set the AF number in this register
+OTYPER: we will send a digital signal through these pins, so set push-pull mode for all of them
+OSPEEDR: let's stop for a while there. What frequency do we need on GPIO pins? SD docs tell us that the maximal bandwidth of an SD card in the SPI mode is 12.5 Mb/s[4]. This means that we'll have max. 12500 MHz on MOSI and MISO lines and 25 MHz on the SCLK line. We will not change the slave 12.5 million times per second (won't we? :) ), but SPI peripheral in STM32 uCs offers us NSSP function (send an NSS pulse between two consecutive data), which would cause NSS line to toggle after every byte - what gives us no more than 1.5625 MHz. Thus, after looking to the datasheet[5], we can set this register to the lowest frequency for every pin.
+PUPDR: MISO and MOSI lines are high by default[6], so we want pull-up resistors on them. NSS line is not specified, but when it's high the slave is not selected and should go to Hi-Z (high impedance) state. We want is as default (so SD is connected only when we clearly specify we want it selected), so we want a pull-up resistor on this pin too. What about SCK? It doesn't matter that much, but, by convention[7] we want the data to be received on clock rising edge - what means that it should be low by default. So pull-down pin there.
+LCKR: after successful configuration, we can set it to freeze the configuration
+IDR, ODR, BSRR, BRR: they're NOPs since don't want to read the data from these pins by ourselves
+
+In the next post, we'll learn how to use the pins we've just configured by setting up the SPI peripheral itself and, hopefully, sending our first data!
