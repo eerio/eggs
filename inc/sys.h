@@ -17,4 +17,4 @@
 #define DMA_SPI_TX_DMA (DMA1)
 #define DMA_SPI_TX_Channel (3U)
 
-
+#define SD_USE_SPI1
