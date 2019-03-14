@@ -16,8 +16,8 @@
 void die(FRESULT rc);
 void test_pff(void);
 
-uint8_t buf[1024] = {0};
-UINT counter;
+BYTE buff[64];
+
 int main(void) {
     /* At this point we assume that the stack is initialized,
      * .data segment is copied to SRAM, .bss segment is zero-filled,
@@ -49,10 +49,8 @@ void test_pff(void) {
 	DIR dir;				/* Directory object */
 	FILINFO fno;			/* File information object */
 	UINT br, i;
-	BYTE buff[64];
-
-
-	FRESULT rc = pf_mount(&fatfs);
+	
+    FRESULT rc = pf_mount(&fatfs);
 	if (rc) die(rc);
 
 	rc = pf_open("hi.txt");
