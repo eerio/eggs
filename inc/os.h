@@ -17,3 +17,7 @@ void init_task(void (*)(void));
 /* Start execution of the tasks in the queue */
 void start_os(uint32_t);
 
+void kill(uint8_t);
+void timedwait(uint8_t);
+void signal(uint8_t);
+
