@@ -71,7 +71,7 @@ void init_task(void (*handler)(void)) {
     TaskTable.tasks_num++;
 }
 
-void start_os(void) {
+void start_os(uint32_t period) {
     /* Set the default TCB
      * We use the last task, so it's get stacked (even though it's already
      * here), and then task #0 begins to execute. The advantage of
@@ -81,8 +81,8 @@ void start_os(void) {
     TaskTable.current_task_num = TaskTable.tasks_num - 1;
     current_tcb = &TaskTable.tasks[TaskTable.current_task_num];
 
-    /* Set SysTick interrupt period to *not*1s */
-    SysTick_Config(SystemCoreClock >> 8);
+    /* Set SysTick interrupt period */
+    SysTick_Config(period);
 
     /* Set the appriopriate Process Stack Pointer, force the processor
      * to use it as its SP and flush the pipeline of the processor

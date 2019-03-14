@@ -15,5 +15,5 @@ void init_os(void);
 void init_task(void (*)(void));
 
 /* Start execution of the tasks in the queue */
-void start_os(void);
+void start_os(uint32_t);
 
