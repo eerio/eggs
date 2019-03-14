@@ -18,3 +18,10 @@
 #define DMA_SPI_TX_Channel (3U)
 
 #define SD_USE_SPI1
+
+
+/* Initialize board's peripherals */
+void init_sys(void);
+
+void quit_sys(void);
+

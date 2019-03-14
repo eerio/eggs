@@ -10,10 +10,8 @@
  * author: Paweł Balawender, github.com/eerio
  *
  */
-#include<config.h>
+#include<sys.h>
 #include<pff.h>
-#include<sd.h>
-#include<semihosting.h>
 
 void die(FRESULT rc);
 void test_pff(void);
@@ -28,13 +26,8 @@ int main(void) {
      * been called. These things are done by ResetHandler in
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
-    const char s[] = "Hello!\n";
-    uint32_t m[] = {2 /* stderr */, (uint32_t)s, sizeof(s)/sizeof(char) - 1};
-    send_command(0x05 /*irq id */, m);
 
     init_sys();
-    //sd_initialize();
-    //sd_readp(buf, 0x00002000, 0, 512);
     test_pff();
     quit_sys();
 
