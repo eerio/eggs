@@ -12,6 +12,13 @@
  */
 #include<sys.h>
 #include<pff.h>
+#include<delay.h>
+
+#define LED_PIN (9U)
+#define LED_ON() (GPIOA->BSRR |= (1U << LED_PIN))
+#define LED_OFF() (GPIOA->BRR |= (1U << LED_PIN))
+
+typedef unsigned int bool;
 
 void die(FRESULT rc);
 void test_pff(void);
@@ -34,6 +41,15 @@ int main(void) {
     /* Main thread after return from the main function goes to an infinite
      * loop in the startup_stm32f091xc.s file */
     return 0;
+}
+
+void handler_blink(bool* kill_flag) {
+    while(*kill_flag == 0) {
+        LED_ON();
+        delay(100000);
+        LED_OFF();
+        delay(100000);
+    }
 }
 
 void die (		/* Stop with dying message */
