@@ -10,14 +10,22 @@
  * author: Paweł Balawender
  * https://github.com/eerio/eggs.git
  */
-#include<config.h>
+#include<delay.h>
 #include<os.h>
-#include<common.h>
+
+#define LED_ON() (GPIOA->BSRR |= (1 << 5))
+#define LED_OFF() (GPIOA->BRR |= (1 << 5))
+
+void handler_blinking_fast(void);
+void handler_blinking_medium(void);
+void handler_blinking_slow(void);
 
 
 int main(void) {
     /* Configure board's peripherals */
-    init_sys();
+    RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+    GPIOA->MODER |= GPIO_MODER_MODER5_0;
+
     /* Setup the operating system environment */
     init_os();
 
@@ -26,11 +34,24 @@ int main(void) {
     init_task(handler_blinking_medium);
     init_task(handler_blinking_slow);
 
-    /* Start executing the threads */
-    start_os();
+    /* Start executing the threads with SysTick interrupt period = 1s*/
+    start_os(SystemCoreClock);
 
     /* Main thread after return from the main function goes to an infinite
      * loop in the startup_stm32f091xc.s file */
     return 0;
 }
+
+void handler_blinking_fast(void) {while(1) LED_ON();}
+
+void handler_blinking_medium(void) {
+    while(1) {
+        LED_ON();
+        delay(50000);
+        LED_OFF();
+        delay(50000);
+    }
+}
+
+void handler_blinking_slow(void) {while(1) LED_OFF();}
 
