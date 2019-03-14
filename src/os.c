@@ -18,6 +18,7 @@ typedef unsigned int bool;
 typedef struct {
     void *sp;
     bool ready;
+    bool cond;
 } TCB;
 
 /* Basic stack frame structure
@@ -68,6 +69,7 @@ void init_task(void (*handler)(void)) {
 
     /* Mark the thread as ready to execute */
     tcb->ready = 1;
+    tcb->cond = 0;
     
     /* Initialize stack */
     StackFrame.PC = (uint32_t)handler;
