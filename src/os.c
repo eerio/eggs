@@ -49,6 +49,15 @@ static struct {
 TCB *current_tcb, *next_tcb;
 
 
+void kill(uint8_t id) {TaskTable.tasks[id].kill_flag = 1;}
+
+void timedwait(uint8_t id) {
+    TaskTable.tasks[id].ready = 0;
+}
+
+void signal(uint8_t id) {TaskTable.tasks[id].ready = 1;}
+void yield(void) {SCB->ICSR |= SCB_ICSR_PENDSTSET_Msk;}
+
 void init_os(void) {
     /* Lowest priority is obligatory for IRQ handlers to execute casually */
     NVIC_EnableIRQ(SysTick_IRQn);
@@ -57,7 +66,7 @@ void init_os(void) {
     NVIC_SetPriority(PendSV_IRQn, 0xFF);
 }
 
-void init_task(void (*handler)(void)) {
+void init_task(void (*handler)(bool*)) {
     /* Add new TCB to the table */
     TCB *tcb = &TaskTable.tasks[TaskTable.tasks_num];
     
@@ -72,9 +81,10 @@ void init_task(void (*handler)(void)) {
     tcb->ready = 1;
     tcb->cond = 0;
     tcb->kill_flag = 0;
-    
+
     /* Initialize stack */
     StackFrame.PC = (uint32_t)handler;
+    StackFrame.r0 = (uint32_t)(&tcb->kill_flag);
     memcpy(tcb->sp, &StackFrame, sizeof StackFrame);
 
     /* Update TaskTable metadata */
@@ -106,8 +116,8 @@ void start_os(uint32_t period) {
      * It corresponds to 6 registers that we want to omit:
      * r0, r1, r2, r3, r12, lr
      */
-    void (**handler)(void) = current_tcb->sp + 0x18;
-    (*(*handler))();
+    void (**handler)(bool*) = current_tcb->sp + 0x18;
+    (*(*handler))(&current_tcb->kill_flag);
 }
 
 void SysTick_Handler(void) {

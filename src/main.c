@@ -13,6 +13,7 @@
 #include<sys.h>
 #include<pff.h>
 #include<delay.h>
+#include<os.h>
 
 #define LED_PIN (9U)
 #define LED_ON() (GPIOA->BSRR |= (1U << LED_PIN))
@@ -25,6 +26,9 @@ void test_pff(void);
 
 BYTE buff[64];
 
+void handler_blink(bool*);
+void handler_still(bool*);
+
 int main(void) {
     /* At this point we assume that the stack is initialized,
      * .data segment is copied to SRAM, .bss segment is zero-filled,
@@ -33,9 +37,15 @@ int main(void) {
      * been called. These things are done by ResetHandler in
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
-
+    RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+    GPIOA->MODER |= GPIO_MODER_MODER9_0;
     init_sys();
-    test_pff();
+    init_os();
+    init_task(handler_blink);
+    init_task(handler_still);
+    start_os(SystemCoreClock);
+
+    //test_pff();
     quit_sys();
 
     /* Main thread after return from the main function goes to an infinite
@@ -43,12 +53,23 @@ int main(void) {
     return 0;
 }
 
-void handler_blink(bool* kill_flag) {
+void handler_blink(bool *kill_flag) {
+    while(*kill_flag == 0) {
+        timedwait(1);
+        for (int i=0; i < 100; ++i) {
+            LED_ON();
+            delay(100000);
+            LED_OFF();
+            delay(100000);
+        }
+        signal(1);
+        yield();
+    }
+}
+
+void handler_still(bool *kill_flag) {
     while(*kill_flag == 0) {
         LED_ON();
-        delay(100000);
-        LED_OFF();
-        delay(100000);
     }
 }
 
