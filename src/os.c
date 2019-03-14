@@ -12,9 +12,12 @@
 #define STACK_SIZE (256U)
 #define DEFAULT_XPSR (0xC1000000U)
 
+typedef unsigned int bool;
+
 /* Task Control Block type */
 typedef struct {
     void *sp;
+    bool ready;
 } TCB;
 
 /* Basic stack frame structure
@@ -62,6 +65,9 @@ void init_task(void (*handler)(void)) {
     
     /* Initialize TCB, leave 32 bytes for 8 initial register values */
     tcb->sp = new_stack + STACK_SIZE - sizeof StackFrame - 32;
+
+    /* Mark the thread as ready to execute */
+    tcb->ready = 1;
     
     /* Initialize stack */
     StackFrame.PC = (uint32_t)handler;
@@ -73,7 +79,7 @@ void init_task(void (*handler)(void)) {
 
 void start_os(uint32_t period) {
     /* Set the default TCB
-     * We use the last task, so it's get stacked (even though it's already
+     * We use the last task, so it gets stacked (even though it's already
      * here), and then task #0 begins to execute. The advantage of
      * this solution is that #0's stack doesn't get spoiled by some
      * unnecessary calls to its handler
@@ -105,10 +111,12 @@ void SysTick_Handler(void) {
     current_tcb = &TaskTable.tasks[TaskTable.current_task_num];
 
     /* Fetch next task to execute */
-    TaskTable.current_task_num++;
-    if (TaskTable.current_task_num >= TaskTable.tasks_num) {
-        TaskTable.current_task_num = 0;
-    }
+    do {
+        TaskTable.current_task_num++;
+        if (TaskTable.current_task_num >= TaskTable.tasks_num) {
+            TaskTable.current_task_num = 0;
+        }
+    } while (TaskTable.tasks[TaskTable.current_task_num].ready == 0);
 
     /* Update next TCB */
     next_tcb = &TaskTable.tasks[TaskTable.current_task_num];
