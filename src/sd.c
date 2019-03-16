@@ -127,6 +127,7 @@ DSTATUS sd_initialize(void) {
     spi_send(blank);
 
     /* send it for at least 1 second; p.46 PhysicalLayerSimplifiedSpec */
+    int x = 0;
     do {
         spi_send(cmd55);
         /* its also obedient; without it acmd41 has resp = illegal cmd */
@@ -134,6 +135,7 @@ DSTATUS sd_initialize(void) {
         spi_send(acmd41);
         spi_send(blank);
         resp = spi_read();
+        if (x++ > 250) while(1) { /* Timeout error: can't initialize card */ }
     } while (*resp);
 
     /* Get CCS */
