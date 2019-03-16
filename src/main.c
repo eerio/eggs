@@ -39,13 +39,13 @@ int main(void) {
      */
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
     GPIOA->MODER |= GPIO_MODER_MODER9_0;
-    init_sys();
+    init_sys();/*
     init_os();
     init_task(handler_blink);
     init_task(handler_still);
-    start_os(SystemCoreClock);
+    start_os(SystemCoreClock);*/
 
-    //test_pff();
+    test_pff();
     quit_sys();
 
     /* Main thread after return from the main function goes to an infinite
