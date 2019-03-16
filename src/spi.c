@@ -112,21 +112,21 @@ void setup_spi(void) {
     /* Slave Select Output enable */
     SPI_SD->CR2 |= SPI_CR2_SSOE;
 
-    configure_DMA(tx_buffer, rx_buffer, TX_BUFFER_SIZE, RX_BUFFER_SIZE); 
+    dma_config(tx_buffer, rx_buffer, TX_BUFFER_SIZE, RX_BUFFER_SIZE); 
 
     /* Enable SPI */
     /* At this point MOSI line and clock are being pulled down */
     SPI_SD->CR1 |= SPI_CR1_SPE;
 
     /* Start DMA */
-    start_DMA();
+    dma_enable();
 }
 
 
 /* procedure: p. 768, 770 */
 void disable_spi(void) {
     /* Disable dma */
-    disable_DMA();
+    dma_disable();
     
     /* Wait until FTLVL[1:] == 0 (no more data to transmit) */
     while (SPI_SD->SR & SPI_SR_FTLVL) {}
