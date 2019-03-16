@@ -8,9 +8,9 @@
 #include<sys.h> /* SPI_SD */
 #include<dma.h>
 
-void configure_DMA(
-        uint8_t tx_buffer[],
-        uint8_t rx_buffer[],
+void dma_config(
+        const volatile uint8_t tx_buffer[],
+        const volatile uint8_t rx_buffer[],
         uint16_t tx_buffer_size,
         uint16_t rx_buffer_size) {
     /* Enable DMA. Procedure: p. 770 */
@@ -56,22 +56,22 @@ void configure_DMA(
     /* Transfer complete interrupt enable */
     DMA_SPI_TX->CCR |= DMA_CCR_TCIE;
     DMA_SPI_RX->CCR |= DMA_CCR_TCIE;
-#if defined(USE_DEFAULT_SPI_SD_TX_DMA) || defined(USE_DEFAULT_SPI_SD_RX_DMA)
+//#if defined(USE_DEFAULT_SPI_SD_TX_DMA) || defined(USE_DEFAULT_SPI_SD_RX_DMA)
     NVIC_EnableIRQ(DMA1_Ch2_3_DMA2_Ch1_2_IRQn);
     NVIC_SetPriority(DMA1_Ch2_3_DMA2_Ch1_2_IRQn, 0);
-#else
-    NVIC_EnableIRQ(DMA1_Ch4_7_DMA2_Ch3_5_IRQn);
-    NVIC_SetPriority(DMA1_Ch4_7_DMA2_Ch3_5_IRQn, 0);
-#endif
+//#else
+    //NVIC_EnableIRQ(DMA1_Ch4_7_DMA2_Ch3_5_IRQn);
+    //NVIC_SetPriority(DMA1_Ch4_7_DMA2_Ch3_5_IRQn, 0);
+//#endif
 }
 
-void start_DMA(void) {
+void dma_enable(void) {
     /* Enable channels */
     DMA_SPI_TX->CCR |= DMA_CCR_EN;
     DMA_SPI_RX->CCR |= DMA_CCR_EN;
 }
 
-void disable_DMA(void) {
+void dma_disable(void) {
     /* Wait till transfer finished */
     while(DMA_SPI_TX->CNDTR != 6) {}
     /* Disable channels */
