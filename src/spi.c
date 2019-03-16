@@ -108,7 +108,7 @@ void setup_spi(void) {
     /* Hardware slave management */
     SPI_SD->CR1 &= ~SPI_CR1_SSM;
     /* Send NSS pulse between two data transfers */
-    //SPI_SD->CR2 |= SPI_CR2_NSSP;
+    SPI_SD->CR2 |= SPI_CR2_NSSP;
     /* Slave Select Output enable */
     SPI_SD->CR2 |= SPI_CR2_SSOE;
 
