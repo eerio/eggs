@@ -15,9 +15,10 @@
 #include<delay.h>
 #include<os.h>
 
-#define LED_PIN (9U)
+#define LED_PIN (5U)
 #define LED_ON() (GPIOA->BSRR |= (1U << LED_PIN))
 #define LED_OFF() (GPIOA->BRR |= (1U << LED_PIN))
+#define LED_TOG() (GPIOA->ODR ^= (1U << LED_PIN))
 
 typedef unsigned int bool;
 
@@ -29,6 +30,14 @@ BYTE buff[64];
 void handler_blink(bool*);
 void handler_still(bool*);
 
+void EXTI4_15_IRQHandler(void) {
+    if (EXTI->PR & EXTI_PR_PIF13) {
+        delay(SystemCoreClock / 8);
+        LED_TOG();  
+        EXTI->PR |= EXTI_PR_PIF13;
+    }
+}
+
 int main(void) {
     /* At this point we assume that the stack is initialized,
      * .data segment is copied to SRAM, .bss segment is zero-filled,
@@ -37,15 +46,36 @@ int main(void) {
      * been called. These things are done by ResetHandler in
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
+    /* Set LD2 to output mode */
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-    GPIOA->MODER |= GPIO_MODER_MODER9_0;
-    init_sys();/*
+    GPIOA->MODER |= GPIO_MODER_MODER5_0;
+
+    /* Enable clock for GPIO port C*/
+    RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+    /* Select push-pull input mode with internal pull-down resistor for B1 */
+    GPIOC->MODER &= ~GPIO_MODER_MODER13;
+    GPIOC->OTYPER &= ~GPIO_OTYPER_OT_13;
+    GPIOC->PUPDR &= ~GPIO_PUPDR_PUPDR13;
+    GPIOC->PUPDR |= GPIO_PUPDR_PUPDR13_1;
+
+    /* Select GPIOC as interrupt source on EXTI line 13 */
+    SYSCFG->EXTICR[3] |= (0b0010 << SYSCFG_EXTICR4_EXTI13_Pos);
+    /* Mask interrupts on EXTI line 13 */
+    EXTI->IMR |= EXTI_IMR_MR13;
+    /* Enable rising edge trigger for exti line 13 */
+    EXTI->RTSR |= EXTI_RTSR_RT13;
+    /* Enable highest-priority interrupt in NVIC */
+    NVIC_EnableIRQ(EXTI4_15_IRQn);
+    NVIC_SetPriority(EXTI4_15_IRQn, 0);
+
+    while(1);
+
+    init_sys();
     init_os();
     init_task(handler_blink);
     init_task(handler_still);
-    start_os(SystemCoreClock);*/
+    start_os(SystemCoreClock);
 
-    test_pff();
     quit_sys();
 
     /* Main thread after return from the main function goes to an infinite
