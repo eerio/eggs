@@ -32,9 +32,11 @@ void handler_still(bool*);
 
 void EXTI4_15_IRQHandler(void) {
     if (EXTI->PR & EXTI_PR_PIF13) {
-        delay(SystemCoreClock / 8);
-        LED_TOG();  
         EXTI->PR |= EXTI_PR_PIF13;
+        delay(100000);
+        LED_TOG();
+    } else {
+        while(1) { /* Invalid EXTI signal on EXTI lines [4:15]! */ }
     }
 }
 
@@ -50,25 +52,33 @@ int main(void) {
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
     GPIOA->MODER |= GPIO_MODER_MODER5_0;
 
-    /* Enable clock for GPIO port C*/
+    /* Set B1 to input mode w/ internal pull-up resistor */
     RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-    /* Select push-pull input mode with internal pull-down resistor for B1 */
     GPIOC->MODER &= ~GPIO_MODER_MODER13;
     GPIOC->OTYPER &= ~GPIO_OTYPER_OT_13;
     GPIOC->PUPDR &= ~GPIO_PUPDR_PUPDR13;
     GPIOC->PUPDR |= GPIO_PUPDR_PUPDR13_1;
 
     /* Select GPIOC as interrupt source on EXTI line 13 */
-    SYSCFG->EXTICR[3] |= (0b0010 << SYSCFG_EXTICR4_EXTI13_Pos);
+    SYSCFG->EXTICR[3] &= ~SYSCFG_EXTICR4_EXTI13;
+    SYSCFG->EXTICR[3] |= (0x0002 << SYSCFG_EXTICR4_EXTI13_Pos);
     /* Mask interrupts on EXTI line 13 */
     EXTI->IMR |= EXTI_IMR_MR13;
-    /* Enable rising edge trigger for exti line 13 */
-    EXTI->RTSR |= EXTI_RTSR_RT13;
+    /* Enable falling edge trigger for exti line 13 */
+    EXTI->FTSR |= EXTI_FTSR_FT13;
     /* Enable highest-priority interrupt in NVIC */
     NVIC_EnableIRQ(EXTI4_15_IRQn);
     NVIC_SetPriority(EXTI4_15_IRQn, 0);
 
-    while(1);
+    /* Set PA9 to output mode */
+    GPIOA->MODER |= GPIO_MODER_MODER9_0;
+
+    while(1) {
+        GPIOA->ODR ^= (1 << 9);
+        delay(100000);
+    }
+
+    return 0;
 
     init_sys();
     init_os();
