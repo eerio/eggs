@@ -10,10 +10,10 @@
  * author: Paweł Balawender, github.com/eerio
  *
  */
-#include<sys.h>
+#include<sys.h> /* init_sys, quit_sys */
 #include<pff.h>
-#include<delay.h>
-#include<os.h>
+#include<delay.h> /* delay */
+#include<os.h> /* timedwait, signal, yield, init_task, init_os, start_os */
 
 #define LED_PIN (5U)
 #define LED_ON() (GPIOA->BSRR |= (1U << LED_PIN))
@@ -24,21 +24,10 @@ typedef unsigned int bool;
 
 void die(FRESULT rc);
 void test_pff(void);
-
-BYTE buff[64];
-
 void handler_blink(bool*);
 void handler_still(bool*);
 
-void EXTI4_15_IRQHandler(void) {
-    if (EXTI->PR & EXTI_PR_PIF13) {
-        EXTI->PR |= EXTI_PR_PIF13;
-        delay(100000);
-        LED_TOG();
-    } else {
-        while(1) { /* Invalid EXTI signal on EXTI lines [4:15]! */ }
-    }
-}
+BYTE buff[64];
 
 int main(void) {
     /* At this point we assume that the stack is initialized,
@@ -48,44 +37,18 @@ int main(void) {
      * been called. These things are done by ResetHandler in
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
-    /* Set LD2 to output mode */
+    /* Threading example: LD2 will blink quickly, then be left on for a while */
+    /*
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
     GPIOA->MODER |= GPIO_MODER_MODER5_0;
-
-    /* Set B1 to input mode w/ internal pull-up resistor */
-    RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-    GPIOC->MODER &= ~GPIO_MODER_MODER13;
-    GPIOC->OTYPER &= ~GPIO_OTYPER_OT_13;
-    GPIOC->PUPDR &= ~GPIO_PUPDR_PUPDR13;
-    GPIOC->PUPDR |= GPIO_PUPDR_PUPDR13_1;
-
-    /* Select GPIOC as interrupt source on EXTI line 13 */
-    SYSCFG->EXTICR[3] &= ~SYSCFG_EXTICR4_EXTI13;
-    SYSCFG->EXTICR[3] |= (0x0002 << SYSCFG_EXTICR4_EXTI13_Pos);
-    /* Mask interrupts on EXTI line 13 */
-    EXTI->IMR |= EXTI_IMR_MR13;
-    /* Enable falling edge trigger for exti line 13 */
-    EXTI->FTSR |= EXTI_FTSR_FT13;
-    /* Enable highest-priority interrupt in NVIC */
-    NVIC_EnableIRQ(EXTI4_15_IRQn);
-    NVIC_SetPriority(EXTI4_15_IRQn, 0);
-
-    /* Set PA9 to output mode */
-    GPIOA->MODER |= GPIO_MODER_MODER9_0;
-
-    while(1) {
-        GPIOA->ODR ^= (1 << 9);
-        delay(100000);
-    }
-
-    return 0;
-
-    init_sys();
     init_os();
     init_task(handler_blink);
     init_task(handler_still);
     start_os(SystemCoreClock);
-
+    */
+    /* FatFS example: there will appear "Hello, world!" in the buff array */
+    init_sys();
+    test_pff();
     quit_sys();
 
     /* Main thread after return from the main function goes to an infinite
@@ -96,7 +59,7 @@ int main(void) {
 void handler_blink(bool *kill_flag) {
     while(*kill_flag == 0) {
         timedwait(1);
-        for (int i=0; i < 100; ++i) {
+        for (int i=0; i < 50; ++i) {
             LED_ON();
             delay(100000);
             LED_OFF();
@@ -113,12 +76,8 @@ void handler_still(bool *kill_flag) {
     }
 }
 
-void die (		/* Stop with dying message */
-	FRESULT rc	/* FatFs return value */
-)
-{
-    quit_sys();
-	for (;;) ;
+void die (FRESULT rc) {
+	while(1);
 }
 
 void test_pff(void) {
