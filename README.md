@@ -2,6 +2,10 @@
 eggs is an Operating System created for STM32 development boards with Cortex-M0 processors.  
 Status: under development since **17 I 2019**  
 
+## How to use:
+Take a file from **example** directory, rename it to main.c and place it in the **src** directory.
+Compile using *make*, then run the OpenOCD server by *make con* and program the board by *make flash*. In the new GDB console, start execution by sending to it *continue* command.
+
 ## Features:
   - Round-robin task-scheduler based on SysTick interrupt  
   - O(1) context switching in the PendSV interrupt handler  
