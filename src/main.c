@@ -14,6 +14,8 @@
 #include<pff.h>
 #include<delay.h> /* delay */
 #include<os.h> /* timedwait, signal, yield, init_task, init_os, start_os */
+#include<semihosting.h> /* send_command */
+#include<stdio.h>
 
 #define LED_PIN (5U)
 #define LED_ON() (GPIOA->BSRR |= (1U << LED_PIN))
@@ -37,6 +39,12 @@ int main(void) {
      * been called. These things are done by ResetHandler in
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
+    printf("Hello from printf");
+
+    /* Semihosting example: Hello, world! will appear in OpenOCD */
+    const char s[] = "Hello, world!\n";
+    uint32_t m[] = {2, (uint32_t)s, sizeof(s) / sizeof(char) - 1};
+    send_command(0x05, m);
     /* Threading example: LD2 will blink quickly, then be left on for a while */
     /*
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
@@ -47,9 +55,11 @@ int main(void) {
     start_os(SystemCoreClock);
     */
     /* FatFS example: there will appear "Hello, world!" in the buff array */
+    /*
     init_sys();
     test_pff();
     quit_sys();
+    */
 
     /* Main thread after return from the main function goes to an infinite
      * loop in the startup_stm32f091xc.s file */
