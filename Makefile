@@ -1,69 +1,63 @@
+# Compiler and debugger commands
 CC = arm-none-eabi-gcc
 GDB = arm-none-eabi-gdb
+
+# Used directories' names
 INC = inc
+INC_CMSIS = $(INC)/CMSIS
 SRC = src
 DEST = dest
 UTIL = util
-LINKER = util/STM32F091RCTx_FLASH.ld
+
+# OpenOCD scripts' location
 OOCD_SCR = /usr/share/openocd/scripts
 
-INCLUDES = -I$(INC) -I$(INC)/CMSIS
+# Path to the linker script
+LINKER = util/STM32F091RCTx_FLASH.ld
+
+# Build options
+INCLUDES = -I$(INC) -I$(INC_CMSIS)
 COMMON_FLAGS = -mcpu=cortex-m0 -mthumb -mlittle-endian -DSTM32F091xC
-COMP_FLAGS = $(COMMON_FLAGS) -std=c99 -g3 -O0 -ffreestanding -Wall -Wextra $(INCLUDES) -c
+COMP_FLAGS = $(COMMON_FLAGS) -std=c99 -g3 -O0 -Wall -Wextra $(INCLUDES) -c
 LINK_FLAGS = $(COMMON_FLAGS) -T$(LINKER) -Wl,--gc-sections --specs=nosys.specs
 
-SRCS = $(wildcard $(SRC)/*.c)
-OBJS = $(patsubst $(SRC)/%.c, $(DEST)/%.o, $(SRCS))
+# Collecting source code files
+_srcs_c = $(wildcard $(SRC)/*.c)
+_srcs_s = $(wildcard $(SRC)/*.s)
+OBJS = $(patsubst $(SRC)/%.c, $(DEST)/%.o, $(_srcs_c)) $(patsubst $(SRC)/%.s, $(DEST)/%.o, $(_srcs_s))
 DEPS = $(INC)/*.h $(INC)/CMSIS/*.h
-STARTUP_SRC = $(SRC)/startup_stm32f091xc.s
-STARTUP_OBJ = $(DEST)/startup_stm32f091xc.o
-TIM_SRC = $(SRC)/TIM2_IRQHandler.s
-TIM_OBJ = $(DEST)/TIM2_IRQHandler.o
-PendSV_SRC = $(SRC)/PendSV_Handler.s
-PendSV_OBJ = $(DEST)/PendSV_Handler.o
 
+# Compile the whole project as the default "make" target
+# Separate debugging symbols' table from the executable itself
 $(DEST)/main.hex: $(DEST)/main.elf
 	arm-none-eabi-objcopy -Oihex $< $@
 	arm-none-eabi-strip --strip-debug --strip-unneeded $@ -o $@
-
 $(DEST)/main.dbg: $(DEST)/main.elf
 	arm-none-eabi-objcopy --only-keep-debug $< $@
 
-$(DEST)/main.elf: $(OBJS) $(STARTUP_OBJ) $(PendSV_OBJ) dest/delay.o dest/semihosting.o
+# Link .o files
+$(DEST)/main.elf: $(OBJS)
 	$(CC) $(LINK_FLAGS) $^ -o $@
 
-dest/semihosting.o: src/semihosting.s
+# Compile every source file
+$(DEST)/%.o: $(SRC)/%.c $(INC)/%.h
+	$(CC) $(COMP_FLAGS) $< -o $@
+$(DEST)/%.o: $(SRC)/%.s $(INC)/%.h
 	$(CC) $(COMP_FLAGS) $< -o $@
 
-dest/delay.o: src/delay.s
+# These 2 files are kidna exceptional - we don't need headers for them
+$(DEST)/main.o: $(SRC)/main.c
 	$(CC) $(COMP_FLAGS) $< -o $@
-
-$(start_os_OBJ): $(start_os_SRC)
-	$(CC) $(COMP_FLAGS) $< -o $@
-
-$(STARTUP_OBJ): $(STARTUP_SRC)
-	$(CC) $(COMP_FLAGS) $< -o $@
-
-$(OBJS): $(DEST)/%.o : $(SRC)/%.c $(DEPS)
-	$(CC) $(COMP_FLAGS) $< -o $@
-
-$(PendSV_OBJ): $(PendSV_SRC)
-	$(CC) $(COMP_FLAGS) $< -o $@
-
-$(TIM_OBJ): $(TIM_SRC)
+$(DEST)/startup_stm32f091xc.o: $(SRC)/startup_stm32f091xc.s
 	$(CC) $(COMP_FLAGS) $< -o $@
 
 .PHONY: con debug flash clean
-
 con:
 	openocd
-
 debug: $(DEST)/main.dbg
 	$(GDB) -x $(UTIL)/debug.gdb
-
 flash: $(DEST)/main.hex $(DEST)/main.dbg
 	$(GDB) -x $(UTIL)/flash.gdb
-
 clean:
 	rm -f $(DEST)/*
 
