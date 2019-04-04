@@ -1,0 +1,118 @@
+# -mapcs-frame  # deprecated
+# -mno-apcs-frame  # deprecated
+
+# Use AAPCS = Procedure Call Standard for the ARM Architecture
+# references:
+# http://kanj.github.io/elfs/book/armMusl/cross-tools/abi.html
+# https://stackoverflow.com/questions/10494848/arm-whats-the-difference-between-apcs-and-aapcs-abi
+-mabi=aapcs
+
+# TODO: do i need it?
+# -mapcs-stack-check
+# -mno-apcs-stack-check
+
+# No need for Position Independent Code generation usually
+# -mapcs-reentrant
+-mno-apcs-reentrant
+
+# Allow reordering instructions in the function prologue
+-msched-prolog
+# -mno-sched-prolog 
+
+# STM32F0xxx Cortex-M0 programming manual p. 17
+-mlittle-endian
+# -mbig-endian 
+
+# Meaningless when we use little-endian images only
+# -mbe8  -mbe32 
+
+# No FPU. Use library calls for floating-point operations; update: fp disabled
+# -mfloat-abi=soft
+# -mfp16-format=name
+
+# meaningless in AAPCS
+# -mthumb-interwork 
+# -mno-thumb-interwork 
+
+# STM32F0 have Cortex-M0 processors
+-mcpu=cortex-m0
+
+# Cortex-M0 is ARMv6-M architecture; disable floating-point instructions
+-march=armv6+nofp
+
+# No FPU nor FP instructions (thanks to -nofp in -march)
+# -mfpu=
+
+# STM32F0 have Cortex-M0 processors; update: it's specified by -mcpu
+# -mtune=cortex-m0
+
+# Option for testing the compiler, irrelevant
+# -mprint-tune-info
+
+# Deprecated
+# -mstructure-size-boundary=n
+
+# Seems legit to abort when noreturn function tries to return
+-mabort-on-noreturn
+
+# Meaningless since the called function addr offset won't be greater than 64MB
+# -mlong-calls
+# -mno-long-calls
+
+# No PIC
+# -msingle-pic-base
+# -mno-single-pic-base
+# -mpic-register=reg
+
+# Undocumented
+-mnop-fun-dllimport
+
+# We have debug symbol tables, don't need that one
+# -mpoke-function-name
+
+# No ARM support on ARMv6-M
+-mthumb
+# -marm
+# -mflip-thumb
+
+# TODO: do I need these 2?
+# -mtpcs-frame
+# -mtpcs-leaf-frame
+
+# Not valid in AAPCS
+# -mcaller-super-interworking 
+# -mcallee-super-interworking 
+
+# Use the best option for the given processor
+-mtp=auto
+# I have no idea what to put there, it doesn't seem very necessary
+# -mtls-dialect=dialect
+
+# Makes sense, but I bet it's not so necessary
+-mword-relocations
+
+# Meaningless on not-Cortex-M3
+# -mfix-cortex-m3-ldrd
+
+# No reading/writing 16-/32-bit values from addr. that aren't 16/32-bit aligned
+# -munaligned-access 
+
+# Meaningless
+# -mneon-for-64bits
+# -mslow-flash-data
+
+# Use unified ASM syntax in inline assembler
+-masm-syntax-unified
+
+# The fuck? But seems like irrelevant for ARMv6-M
+# -mrestrict-it
+
+# It's for debugging the compiler, meaningless for us
+# -mverbose-cost-dump
+
+# No MOVT instruction on ARMv6-M
+-mpure-code
+
+# Meaningless on ARMv6-M
+-mcmse
+
