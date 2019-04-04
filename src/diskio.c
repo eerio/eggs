@@ -41,7 +41,7 @@ DRESULT disk_writep (
 	DWORD sc		/* Sector number (LBA) or Number of bytes to send */
 )
 {
-	DRESULT res;
+	DRESULT res=0;
 
 
 	if (!buff) {
