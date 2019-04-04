@@ -15,7 +15,6 @@
 #include<delay.h> /* delay */
 #include<os.h> /* timedwait, signal, yield, init_task, init_os, start_os */
 #include<semihosting.h> /* send_command */
-#include<stdio.h>
 
 #define LED_PIN (5U)
 #define LED_ON() (GPIOA->BSRR |= (1U << LED_PIN))
@@ -39,8 +38,6 @@ int main(void) {
      * been called. These things are done by ResetHandler in
      * startup_<device>.s file and SystemInit func in system_<device_fam>.c
      */
-    printf("Hello from printf");
-
     /* Semihosting example: Hello, world! will appear in OpenOCD */
     const char s[] = "Hello, world!\n";
     uint32_t m[] = {2, (uint32_t)s, sizeof(s) / sizeof(char) - 1};
@@ -86,7 +83,8 @@ void handler_still(bool *kill_flag) {
     }
 }
 
-void die (FRESULT rc) {
+void die (volatile FRESULT rc) {
+    rc;
 	while(1);
 }
 
@@ -94,7 +92,7 @@ void test_pff(void) {
 	FATFS fatfs;			/* File system object */
 	DIR dir;				/* Directory object */
 	FILINFO fno;			/* File information object */
-	UINT br, i;
+	UINT br;
 	
     FRESULT rc = pf_mount(&fatfs);
 	if (rc) die(rc);
