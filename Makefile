@@ -17,7 +17,7 @@ LINKER = util/STM32F091RCTx_FLASH.ld
 
 # Build options
 INCLUDES = -I$(INC) -I$(INC_CMSIS)
-COMMON_FLAGS = -mcpu=cortex-m0 -mthumb -mlittle-endian -DSTM32F091xC
+COMMON_FLAGS = -mcpu=cortex-m0 -mthumb -mlittle-endian -DSTM32F091xC -ffreestanding
 COMP_FLAGS = $(COMMON_FLAGS) -std=c99 -g3 -O0 -Wall -Wextra $(INCLUDES) -c
 LINK_FLAGS = $(COMMON_FLAGS) -T$(LINKER) -Wl,--gc-sections --specs=nosys.specs
 
